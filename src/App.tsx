@@ -1,20 +1,38 @@
 import { useState } from 'react'
-import { Tab, TabList, TabPanel, Tabs } from 'react-tabs'
+import { ReactTabsFunctionComponent, Tab, TabList, TabPanel, TabProps, Tabs } from 'react-tabs'
 
 import reactLogo from './assets/react.svg'
 import viteLogo from '/vite.svg'
 import 'react-tabs/style/react-tabs.css';
 import './App.css'
 
-function App() {
+interface IconTabData extends TabProps
+{
+	iconUrl: string;
+	title: string;
+}
+
+const IconTab: ReactTabsFunctionComponent<IconTabData> = ({iconUrl: imageUrl, title, ...other}) => (
+	<Tab style={{ alignItems: "center", display: "inline-flex", flexFlow: "column", gap: "0.5em" }}
+		{...other}>
+		<img src={imageUrl} style={{ height: "2em", width: "2em" }}/>
+		{title}
+	</Tab>
+);
+
+IconTab.tabsRole = "Tab";
+
+export default function App()
+{
 	const [count, setCount] = useState(0)
 
 	return (
 		<Tabs className="tabs-container">
 			<TabList style={{ textAlign: "center" }}>
-				<Tab>Pokédex</Tab>
-				<Tab>Favoritos</Tab>
-				<Tab>Cachédex</Tab>
+				<IconTab iconUrl="https://cdn-icons-png.flaticon.com/512/188/188940.png" title="Pokédex"/>
+				<IconTab iconUrl="https://res.cloudinary.com/shiny24/image/upload/v1669396824/pokemon/shiny_symbol_pokemon_tdxjdc.png"
+						 title="Favoritos"/>
+				<IconTab iconUrl="https://www.freeiconspng.com/uploads/floppy-save-icon--23.png" title="Cachédex"/>
 			</TabList>
 
 			<TabPanel>
@@ -52,5 +70,3 @@ function App() {
 		</Tabs>
 	)
 }
-
-export default App

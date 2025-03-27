@@ -1,25 +1,11 @@
 import { useState } from 'react'
-import { ReactTabsFunctionComponent, Tab, TabList, TabPanel, TabProps, Tabs } from 'react-tabs'
+import { TabList, TabPanel, Tabs } from 'react-tabs'
 
+import { IconTab } from './components/icon-tab';
 import reactLogo from './assets/react.svg'
 import viteLogo from '/vite.svg'
 import 'react-tabs/style/react-tabs.css';
 import './App.css'
-
-interface IconTabData extends TabProps
-{
-	iconUrl: string;
-	title: string;
-}
-
-const IconTab: ReactTabsFunctionComponent<IconTabData> = ({iconUrl: imageUrl, title, ...other}) => (
-	<Tab className="icon-tab" selectedClassName="icon-tab-selected" {...other}>
-		<img className="icon-tab-image" src={imageUrl}/>
-		{title}
-	</Tab>
-);
-
-IconTab.tabsRole = "Tab";
 
 export default function App()
 {

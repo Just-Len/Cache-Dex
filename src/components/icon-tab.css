@@ -1,0 +1,27 @@
+.icon-tab {
+	border: 1px solid transparent;
+	border-bottom: none;
+	bottom: -1px;
+	position: relative;
+	list-style: none;
+	padding: 6px 12px;
+	cursor: pointer;
+
+	align-items: center;
+	display: inline-flex;
+	flex-flow: column;
+	gap: 0.5em;
+	outline: none;
+}
+.icon-tab-selected {
+	background: #fff;
+    border-color: #aaa;
+    color: black;
+
+	border-radius: 10px 10px 0 0;
+}
+.icon-tab-image {
+	height: 2em;
+	width: 2em;
+}
+

@@ -13,9 +13,8 @@ interface IconTabData extends TabProps
 }
 
 const IconTab: ReactTabsFunctionComponent<IconTabData> = ({iconUrl: imageUrl, title, ...other}) => (
-	<Tab style={{ alignItems: "center", display: "inline-flex", flexFlow: "column", gap: "0.5em" }}
-		{...other}>
-		<img src={imageUrl} style={{ height: "2em", width: "2em" }}/>
+	<Tab className="icon-tab" selectedClassName="icon-tab-selected" {...other}>
+		<img className="icon-tab-image" src={imageUrl}/>
 		{title}
 	</Tab>
 );

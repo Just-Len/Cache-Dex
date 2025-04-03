@@ -36,10 +36,10 @@ self.addEventListener("fetch", event => {
 
 
 			console.log("Cache miss :(")
-			const externalResponse = await fetch(event.request);
+			const externalResponse = await fetch(event.request)
 			if (url.startsWith(API_URL) && externalResponse.ok) {
-				const cache = await caches.open(API_CACHE_NAME);
-				await cache.put(event.request, externalResponse.clone());
+				const cache = await caches.open(API_CACHE_NAME)
+				await cache.put(event.request, externalResponse.clone())
 			}
 
             return externalResponse;
@@ -53,7 +53,7 @@ self.addEventListener("activate", (event) => {
         .keys()
         .then(cacheNames => {
             const promises = cacheNames.map(name => {
-                if (name !== CACHE_NAME) {
+                if (name !== CACHE_NAME && name != API_CACHE_NAME) {
                     console.log("Deleting old cache: ", name)
                     return caches.delete(name);
                 }

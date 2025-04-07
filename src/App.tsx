@@ -1,10 +1,12 @@
 import { TabList, TabPanel, Tabs } from "react-tabs"
 
-import { IconTab } from "./components/icon-tab";
+import { IconTab } from "./components/Home/icon-tab";
 import "react-tabs/style/react-tabs.css";
 import { ApiClient } from "./services/api-client";
+import 'bootstrap/dist/css/bootstrap.min.css';
 import "./App.css"
 import { useEffect } from "react";
+import { Pokedex } from "./components/Pokedex";
 
 export default function App()
 {
@@ -15,7 +17,7 @@ export default function App()
 		new ApiClient().moves().then(data => console.log("Moves: ", data));
 	}, []);
 	return (
-		<Tabs className="tabs-container">
+		<Tabs className="tabs-container container-fluid bg-dark text-light">
 			<TabList style={{ textAlign: "center" }}>
 				<IconTab iconUrl="image/pokedex.png" title="Pokédex"/>
 				<IconTab iconUrl="image/pokemon-shiny.png" title="Favoritos"/>
@@ -23,9 +25,8 @@ export default function App()
 			</TabList>
 
 			<TabPanel>
-				<h1 style={{ textAlign: "center" }}>Todavía nada por aquí (Alvarado)</h1>
+				<Pokedex/>
 			</TabPanel>
-
 			<TabPanel>
 				<h1 style={{ textAlign: "center" }}>Todavía nada por aquí (Coco)</h1>
 			</TabPanel>

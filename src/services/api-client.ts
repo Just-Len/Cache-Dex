@@ -5,21 +5,21 @@ const API_URL = "https://pokeapi.co/api/v2";
 interface PaginatedResponse<T>
 {
 	count: number;
-	next?: string;
-	previous?: string;
-	name: string;
+	next?: String;
+	previous?: String;
+	name: String;
 	results: T[];
 }
 
 interface IndexItem
 {
-	name: string;
-	url: string;
+	name: String;
+	url: String;
 }
 
 export class ApiClient
 {
-	private async fetchFromIndex<T>(endpoint: string, count: number, offset: number): Promise<T[]>
+	private async fetchFromIndex<T>(endpoint: String, count: number, offset: number): Promise<T[]>
 	{
 		const indexResponse = await fetch(`${API_URL}/${endpoint}?limit=${count}&offset=${offset}`);
 		if (!indexResponse.ok) {
@@ -61,4 +61,3 @@ export class ApiClient
 		return this.fetchFromIndex("type", count, offset);
 	}
 }
-

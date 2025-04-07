@@ -34,7 +34,6 @@ self.addEventListener("fetch", event => {
                 return response
             }
 
-
 			console.log("Cache miss :(")
 			const externalResponse = await fetch(event.request)
 			if (url.startsWith(API_URL) && externalResponse.ok) {
@@ -66,3 +65,46 @@ self.addEventListener("activate", (event) => {
 
     event.waitUntil(promise)
 })
+
+//Se guardan solo las url? o todo el pokemon con detalles? usando localstorage?
+
+//function to get pokemons in cache
+async function getPokemonsInCache() {
+    
+	const cache = await caches.open(API_CACHE_NAME);
+	const requests = await cache.keys();
+
+	return Promise.all(
+		requests.map(req => cache.match(req).then(res => res.json()))
+	);
+}
+//Function to delete pokemons in cache
+async function deleteCache() {
+
+	try {
+		const cache = await caches.open(API_CACHE_NAME);
+		const keys = await cache.keys();
+
+		await Promise.all(keys.map(request => cache.delete(request)));
+
+		console.log("Pokemons in cache removed");
+	} catch (error) {
+		console.error("Error: ", error);
+	}
+}
+//function to delete an especific pokemon from cache
+async function deletePokemon(pokemonUrl) {
+
+	try {
+		const cache = await caches.open(API_CACHE_NAME);
+		const eliminado = await cache.delete(pokemonUrl);
+
+		if (eliminado) {
+			console.log(`Pokemon removed: ${pokemonUrl}`);
+		} else {
+			console.warn(`Pokemon not found: ${pokemonUrl}`);
+		}
+	} catch (error) {
+		console.error("Error while trying to remove the pokemon:", error);
+	}
+}

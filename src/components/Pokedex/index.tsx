@@ -9,15 +9,18 @@ export const Pokedex: React.FC = () => {
     const [hasMore, setHasMore] = useState(true);
     const [index, setIndex] = useState(0);
     const [pokemons, setPokemons] = useState<PokeAPI.Pokemon[]>([]);
+    const [filteredPokemons, setFilteredPokemons] = useState<PokeAPI.Pokemon[]>([]);
+    const [pokemonsToShow, setPokemonsToShow] = useState<PokeAPI.Pokemon[]>([]);
 
     const apiClient = new ApiClient();
 
     const fetchPokemons = async (offset: number) => {
         const data = await apiClient.pokemon(10, offset);
-        setPokemons(((prev) => {
+        setPokemonsToShow(((prev) => {
             const uniquePokemon = data.filter(
                 (pokemon) => !prev.some((p) => p.id === pokemon.id)
             );
+            setPokemons([...prev, ...uniquePokemon]);
             return [...prev, ...uniquePokemon];
         }));
         setHasMore(data.length > 0);
@@ -31,20 +34,35 @@ export const Pokedex: React.FC = () => {
         const newIndex = index + 10;
         await fetchPokemons(newIndex);
         setIndex(newIndex);
+        setPokemons(pokemonsToShow);
+    }
+
+    const handleSearch = (event: React.ChangeEvent<HTMLInputElement>) => {
+        if(event.target.value === ''){
+            setPokemonsToShow(pokemons);
+        }else{
+            const searchValue = event.target.value.toLowerCase();
+            const filtered = pokemons.filter((pokemon) => pokemon.name.toLowerCase().includes(searchValue));
+            setFilteredPokemons(filtered);
+            setPokemonsToShow(filteredPokemons);
+        }
     }
 
     return (
         <div className='container-fluid'>
-            <p className='text-center'>Pokedex</p>
+            <h1 className='text-center'>Pokédex</h1>
+            <label>Buscar:</label>
+            <input id='search-input' onChange={handleSearch} type="text" />
             <InfiniteScroll
-              dataLength={pokemons.length}
+              dataLength={pokemonsToShow.length}
               next={fetchMoreData}
               hasMore={hasMore}
-              loader={<h4 className='text-center'>Loading...</h4>}>
+              loader={<h4 className='text-center'>Cargando...</h4>}>
                 <div className='container-fluid'>
                     <div className='row'>
-                        {pokemons && pokemons.map((pokemon) => <Pokecard key={pokemon.id} id={pokemon.id} />)}
+                        {pokemonsToShow && pokemonsToShow.map((pokemon) => <Pokecard key={pokemon.id} id={pokemon.id} />)}
                     </div>
+                    
                 </div>
             </InfiniteScroll>
         </div>

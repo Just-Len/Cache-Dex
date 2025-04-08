@@ -23,7 +23,7 @@ export class ApiClient
 	{
 		const indexResponse = await fetch(`${API_URL}/${endpoint}?limit=${count}&offset=${offset}`);
 		if (!indexResponse.ok) {
-			throw new Error("Couldn't fetch moves");
+			throw new Error("Couldn't fetch index");
 		}
 
 		const index: PaginatedResponse<IndexItem> = await indexResponse.json();
@@ -34,6 +34,22 @@ export class ApiClient
 		);
 
 		return items;
+	}
+
+	async pokemonCount(): Promise<number>
+	{
+		const indexResponse = await fetch(`${API_URL}/pokemon?limit=1`);
+		if (!indexResponse.ok) {
+			throw new Error("Couldn't fetch index");
+		}
+
+		const index: PaginatedResponse<IndexItem> = await indexResponse.json();
+		return index.count;
+	}
+
+	async allPokemon()
+	{
+		
 	}
 
 	// Name: names[index].name
@@ -56,7 +72,7 @@ export class ApiClient
 	}
 
 	// Name: names[index].name
-	async pokemonTypes(count = 64, offset = 0): Promise<PokeAPI.PokemonType[]>
+	async pokemonTypes(count = 64, offset = 0): Promise<PokeAPI.Type[]>
 	{
 		return this.fetchFromIndex("type", count, offset);
 	}

@@ -60,7 +60,7 @@ export const Pokedex: React.FC = () => {
               loader={<h4 className='text-center'>Cargando...</h4>}>
                 <div className='container-fluid'>
                     <div className='row'>
-                        {pokemonsToShow && pokemonsToShow.map((pokemon) => <Pokecard key={pokemon.id} id={pokemon.id} />)}
+                        {pokemonsToShow && pokemonsToShow.map((pokemon) =><Pokecard key={pokemon.id} pokemon={pokemon} types={[]} />)}
                     </div>
                     
                 </div>

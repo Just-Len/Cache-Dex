@@ -1,20 +1,32 @@
 import { PokeAPI } from "pokeapi-types";
 import './PokeCard.css'
-import { PokemonService } from "../../services/pokemon-service";
+import { useState } from "react";
 
 interface PokecardProps
 {
 	pokemon: PokeAPI.Pokemon;
 	species?: PokeAPI.PokemonSpecies;
 	types: PokeAPI.Type[];
+	favoriteAction: (pokemon: PokeAPI.Pokemon) => void;
 }
 
-const pokemonService = new PokemonService();
 
-export const Pokecard: React.FC<PokecardProps> = ({ pokemon, species, types }) => {
+export function Pokecard({ pokemon, species, types, favoriteAction }: PokecardProps)
+{
+	// I don't care about typing here anymore
+	const [favorite, setFavorite] = useState((pokemon as any).favorite || false);
+
+	let favoriteButtonText;
 	let name = pokemon.name;
 	let typeName = pokemon.types[0].type.name;
 	let spriteUrl: string | undefined;
+
+	if (favorite) {
+		favoriteButtonText = "Remover de favoritos";
+	}
+	else {
+		favoriteButtonText = "Agregar a favoritos";
+	}
 
 	if (species) {
 		const speciesLocalizedName = species.names.find(name => name.language.name == "es");
@@ -24,7 +36,7 @@ export const Pokecard: React.FC<PokecardProps> = ({ pokemon, species, types }) =
 		}
 	}
 
-	if (types && types.length > 0) {
+	if (types.length > 0) {
 		const typeLocalizedName = types[0].names.find(name => name.language.name == "es");
 
 		if (typeLocalizedName) {
@@ -32,26 +44,17 @@ export const Pokecard: React.FC<PokecardProps> = ({ pokemon, species, types }) =
 		}
 	}
 	
-    const savePokemon = async (_: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
-        const success = pokemonService.setFavorite(pokemon.id);
-		/*if(pokemonService['_favoriteIds'].includes(pokemon.id)){
-			alert("Este pokemon ya se encuentra en favoritos")
-			return;
-		}*/
-		if (success) {
-			alert("Pokemon guardado en favoritos");
-		}
-		else {
-			alert("Error al guardar el pokemon en favoritos");
-		}
-    }
-
 	if (pokemon.sprites.other && pokemon.sprites.other["official-artwork"]) {
 		const officialArtwork = pokemon.sprites.other["official-artwork"];
 		if (officialArtwork) {
 			spriteUrl = officialArtwork.front_default as string;
 		}
 	}
+
+    function toggleFavorite(_: React.MouseEvent<HTMLButtonElement, MouseEvent>) {
+		favoriteAction(pokemon);
+		setFavorite(!favorite);
+    }
 
 	return (
 		<div className="col-sm-6 col-md-4 col-lg-3 mb-4">
@@ -71,9 +74,9 @@ export const Pokecard: React.FC<PokecardProps> = ({ pokemon, species, types }) =
 	  
 			  <button
 				className="btn btn-warning mt-auto px-4 rounded-pill"
-				onClick={(event) => savePokemon(event)}
+				onClick={(event) => toggleFavorite(event)}
 			  >
-				⭐ Guardar en favoritos
+				⭐ <p style={{ display: "inline"}}> {favoriteButtonText} </p>
 			  </button>
 			</div>
 		  </div>

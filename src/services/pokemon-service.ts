@@ -46,11 +46,13 @@ export class PokemonService
 
     async pokemons(offset: number)
 	{
-		const pokemonCount = await this._apiClient.pokemonCount();
+		const pokemonCount  = await this._apiClient.pokemonCount();
 		let pokemons: PokeAPI.Pokemon[];
 
 		if (offset <= pokemonCount && this._pokemons.length <= offset) {
 			pokemons = await this._apiClient.pokemon(CHUNK_SIZE, offset);
+			pokemons.forEach((pokemon: any) => pokemon.favorite = this._favoriteIds.includes(pokemon.id));
+
 			this._pokemons.push(...pokemons);
 		}
 		else {
@@ -85,10 +87,11 @@ export class PokemonService
 		return this._pokemonTypes;
 	}
 
-    unsetFavorite(id: number): boolean
+    unsetFavorite(pokemon: PokeAPI.Pokemon): boolean
 	{
         try {
-			const newFavorites = this._favoriteIds.filter(favorite => favorite != id);
+			(pokemon as any).favorite = false;
+			const newFavorites = this._favoriteIds.filter(favoriteId => favoriteId != pokemon.id);
 			if(newFavorites.length != this._favoriteIds.length){
 				this._favoriteIds = newFavorites;
 				localStorage.setItem(LOCAL_STORAGE_FAVORITES_KEY, JSON.stringify(this._favoriteIds));
@@ -101,11 +104,12 @@ export class PokemonService
         }
     }
 
-    setFavorite(id: number): boolean
+    setFavorite(pokemon: PokeAPI.Pokemon): boolean
 	{
         try {
-			if(!this._favoriteIds.includes(id)){
-				this._favoriteIds.push(id);
+			(pokemon as any).favorite = true;
+			if(!this._favoriteIds.includes(pokemon.id)){
+				this._favoriteIds.push(pokemon.id);
 				localStorage.setItem(LOCAL_STORAGE_FAVORITES_KEY, JSON.stringify(this._favoriteIds));
 			}
 

@@ -34,10 +34,10 @@ export const Pokecard: React.FC<PokecardProps> = ({ pokemon, species, types }) =
 	
     const savePokemon = async (_: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
         const success = pokemonService.setFavorite(pokemon.id);
-		if(pokemonService['_favoriteIds'].includes(pokemon.id)){
+		/*if(pokemonService['_favoriteIds'].includes(pokemon.id)){
 			alert("Este pokemon ya se encuentra en favoritos")
 			return;
-		}
+		}*/
 		if (success) {
 			alert("Pokemon guardado en favoritos");
 		}

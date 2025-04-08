@@ -84,4 +84,27 @@ export class PokemonService
 
 		return this._pokemonTypes;
 	}
+
+	async getPokemons() {
+		const pokemons = await JSON.parse(localStorage.getItem('pokemons') || '[]');
+        return pokemons;
+    }
+
+    async setPokemon(id: number){
+        try{
+            const pokemons: number[] = await this.getPokemons();
+			if(!pokemons.includes(id)){
+				pokemons.push(id);
+				localStorage.setItem('pokemons', JSON.stringify(pokemons));
+				console.log("Pokemon guardado en local storage", pokemons);
+				return 0;
+			}else{
+				console.warn("Pokemon ya guardado en local storage", pokemons);
+				return 1;
+			}
+        }catch (error) {
+            console.error("Error saving pokemon to local storage", error);
+            return -1;
+        }
+    }
 }

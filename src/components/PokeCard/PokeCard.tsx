@@ -1,6 +1,6 @@
 import { PokeAPI } from "pokeapi-types";
 import './PokeCard.css'
-import { LocalStorageService } from "../../services/local-storage";
+import { PokemonService } from "../../services/pokemon-service";
 
 interface PokecardProps
 {
@@ -9,7 +9,7 @@ interface PokecardProps
 	types: PokeAPI.Type[];
 }
 
-const localStorageService = new LocalStorageService();
+const pokemonService = new PokemonService();
 
 export const Pokecard: React.FC<PokecardProps> = ({ pokemon, species, types }) => {
 	let name = pokemon.name;
@@ -33,11 +33,17 @@ export const Pokecard: React.FC<PokecardProps> = ({ pokemon, species, types }) =
 	}
 	
     const savePokemon = async (_: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
-        const response = await localStorageService.setPokemon(pokemon.id);
-        if (response === 0) {
-            alert("Pokemon guardado en favoritos");
-        } else{
-            alert("Error al guardar el pokemon en favoritos");
+        const response = await pokemonService.setPokemon(pokemon.id);
+        switch (response) {
+            case 0:
+                alert("Pokemon guardado en favoritos");
+                break;
+            case 1:
+                alert("Pokemon ya guardado en favoritos");
+                break;
+            case -1:
+                alert("Error al guardar el pokemon en favoritos");
+                break;
         }
     }
 
@@ -58,7 +64,6 @@ export const Pokecard: React.FC<PokecardProps> = ({ pokemon, species, types }) =
 			</div>
 			<p className="text-center">{typeName}</p>
 			<p className="text-center">{pokemon?.id}</p>
-			<button>Guardar en cache</button>
 			<div className="text-center">
                 <button onClick={(event) => savePokemon(event)}>Guardar en favoritos</button>
             </div>

@@ -85,26 +85,34 @@ export class PokemonService
 		return this._pokemonTypes;
 	}
 
-	async getPokemons() {
-		const pokemons = await JSON.parse(localStorage.getItem('pokemons') || '[]');
-        return pokemons;
+    unsetFavorite(id: number): boolean
+	{
+        try {
+			const newFavorites = this._favoriteIds.filter(favorite => favorite != id);
+			if(newFavorites.length != this._favoriteIds.length){
+				this._favoriteIds = newFavorites;
+				localStorage.setItem(LOCAL_STORAGE_FAVORITES_KEY, JSON.stringify(this._favoriteIds));
+			}
+
+			return true;
+        } catch (error) {
+            console.error("Error saving pokemon to local storage", error);
+            return false;
+        }
     }
 
-    async setPokemon(id: number){
-        try{
-            const pokemons: number[] = await this.getPokemons();
-			if(!pokemons.includes(id)){
-				pokemons.push(id);
-				localStorage.setItem('pokemons', JSON.stringify(pokemons));
-				console.log("Pokemon guardado en local storage", pokemons);
-				return 0;
-			}else{
-				console.warn("Pokemon ya guardado en local storage", pokemons);
-				return 1;
+    setFavorite(id: number): boolean
+	{
+        try {
+			if(!this._favoriteIds.includes(id)){
+				this._favoriteIds.push(id);
+				localStorage.setItem(LOCAL_STORAGE_FAVORITES_KEY, JSON.stringify(this._favoriteIds));
 			}
-        }catch (error) {
+
+			return true;
+        } catch (error) {
             console.error("Error saving pokemon to local storage", error);
-            return -1;
+            return false;
         }
     }
 }

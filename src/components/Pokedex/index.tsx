@@ -1,52 +1,62 @@
 import React, {useEffect, useState} from 'react';
 import { Pokecard } from '../PokeCard/PokeCard';
 import { PokeAPI } from 'pokeapi-types';
-import {  ApiClient } from '../../services/api-client';
 import './index.css'
 import InfiniteScroll from 'react-infinite-scroll-component';
+import { PokemonService } from '../../services/pokemon-service';
+
+const service = new PokemonService();
 
 export const Pokedex: React.FC = () => {
     const [hasMore, setHasMore] = useState(true);
     const [index, setIndex] = useState(0);
+    const [searchFilter, setSearchFilter] = useState("");
     const [pokemons, setPokemons] = useState<PokeAPI.Pokemon[]>([]);
+    const [pokemonSpecies, setPokemonSpecies] = useState<PokeAPI.PokemonSpecies[]>([]);
+    const [pokemonTypes, setPokemonTypes] = useState<PokeAPI.Type[]>([]);
     const [filteredPokemons, setFilteredPokemons] = useState<PokeAPI.Pokemon[]>([]);
-    const [pokemonsToShow, setPokemonsToShow] = useState<PokeAPI.Pokemon[]>([]);
-
-    const apiClient = new ApiClient();
 
     const fetchPokemons = async (offset: number) => {
-        const data = await apiClient.pokemon(10, offset);
-        setPokemonsToShow(((prev) => {
-            const uniquePokemon = data.filter(
-                (pokemon) => !prev.some((p) => p.id === pokemon.id)
-            );
-            setPokemons([...prev, ...uniquePokemon]);
-            return [...prev, ...uniquePokemon];
-        }));
-        setHasMore(data.length > 0);
+		const pokemonRequest = service.pokemons(offset);
+        const pokemonSpeciesRequest = service.pokemonSpecies(offset);
+
+		await Promise.all([pokemonRequest, pokemonSpeciesRequest]);
+		const newPokemons = await pokemonRequest;
+		setPokemonSpecies([...pokemonSpecies, ...(await pokemonSpeciesRequest)]);
+		setPokemons([...pokemons, ...newPokemons]);
+        setHasMore(newPokemons.length > 0);
     };
 
+	useEffect(() => {
+		service.types().then(types => setPokemonTypes(types));
+	}, []);
+
     useEffect(() => {
-        fetchPokemons(0);
-    }, []);
+        fetchPokemons(index);
+    }, [index]);
+
+	useEffect(() => {
+		filterPokemons(searchFilter);
+	}, [searchFilter, pokemons]);
 
     const fetchMoreData = async () => {
-        const newIndex = index + 10;
-        await fetchPokemons(newIndex);
+        const newIndex = index + 50;
         setIndex(newIndex);
-        setPokemons(pokemonsToShow);
     }
 
-    const handleSearch = (event: React.ChangeEvent<HTMLInputElement>) => {
-        if(event.target.value === ''){
-            setPokemonsToShow(pokemons);
-        }else{
-            const searchValue = event.target.value.toLowerCase();
-            const filtered = pokemons.filter((pokemon) => pokemon.name.toLowerCase().includes(searchValue));
+	function filterPokemons(filter: string) {
+        if (filter === "") {
+            setFilteredPokemons(pokemons);
+        } else {
+            const searchValue = filter.toLowerCase();
+            const filtered = pokemons.filter(pokemon => pokemon.name.toLowerCase().includes(searchValue));
             setFilteredPokemons(filtered);
-            setPokemonsToShow(filteredPokemons);
         }
-    }
+	}
+
+    const handleSearch = (event: React.ChangeEvent<HTMLInputElement>) => {
+		setSearchFilter(event.target.value);
+	}
 
     return (
         <div className='container-fluid'>
@@ -54,13 +64,13 @@ export const Pokedex: React.FC = () => {
             <label>Buscar:</label>
             <input id='search-input' onChange={handleSearch} type="text" />
             <InfiniteScroll
-              dataLength={pokemonsToShow.length}
+              dataLength={filteredPokemons.length}
               next={fetchMoreData}
               hasMore={hasMore}
               loader={<h4 className='text-center'>Cargando...</h4>}>
                 <div className='container-fluid'>
                     <div className='row'>
-                        {pokemonsToShow && pokemonsToShow.map((pokemon) =><Pokecard key={pokemon.id} pokemon={pokemon} types={[]} />)}
+                        {filteredPokemons && filteredPokemons.map((pokemon) =><Pokecard key={pokemon.id} pokemon={pokemon} types={[]} />)}
                     </div>
                     
                 </div>

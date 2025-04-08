@@ -50,19 +50,31 @@ export const Pokecard: React.FC<PokecardProps> = ({ pokemon, species, types }) =
 	}
 
 	return (
-		<div className="col-sm-4 col-md-3 col bg-dark">
-			<p className="text-center">{name}</p>
-			<div className="text-center">
-				<img width="60%" height="auto"
-					src={spriteUrl}
-					alt="Imagen de pokemon" />
+		<div className="col-sm-6 col-md-4 col-lg-3 mb-4">
+		  <div className="card h-100 shadow bg-dark text-white rounded-4">
+			<div className="card-body d-flex flex-column align-items-center">
+			  <h5 className="card-title text-capitalize">{name}</h5>
+	  
+			  <img
+				src={spriteUrl}
+				alt={`Imagen de ${name}`}
+				className="mb-3"
+				style={{ width: "80%", height: "auto" }}
+			  />
+	  
+			  <p className="mb-1"><strong>Tipo:</strong> {typeName}</p>
+			  <p className="mb-3"><strong>ID:</strong> {pokemon?.id}</p>
+	  
+			  <button
+				className="btn btn-warning mt-auto px-4 rounded-pill"
+				onClick={(event) => savePokemon(event)}
+			  >
+				⭐ Guardar en favoritos
+			  </button>
 			</div>
-			<p className="text-center">{typeName}</p>
-			<p className="text-center">{pokemon?.id}</p>
-			<div className="text-center">
-                <button onClick={(event) => savePokemon(event)}>Guardar en favoritos</button>
-            </div>
+		  </div>
 		</div>
-	);
+	  );
+	  
 }
 

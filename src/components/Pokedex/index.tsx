@@ -59,22 +59,38 @@ export const Pokedex: React.FC = () => {
 	}
 
     return (
-        <div className='container-fluid'>
-            <h1 className='text-center'>Pokédex</h1>
-            <label>Buscar:</label>
-            <input id='search-input' onChange={handleSearch} type="text" />
-            <InfiniteScroll
-              dataLength={filteredPokemons.length}
-              next={fetchMoreData}
-              hasMore={hasMore}
-              loader={<h4 className='text-center'>Cargando...</h4>}>
-                <div className='container-fluid'>
-                    <div className='row'>
-                        {filteredPokemons && filteredPokemons.map((pokemon) =><Pokecard key={pokemon.id} pokemon={pokemon} types={[]} />)}
-                    </div>
-                    
-                </div>
-            </InfiniteScroll>
+        <div className="container-fluid py-4">
+          <h1 className="text-center mb-4">Pokédex</h1>
+      
+          <div className="d-flex justify-content-center mb-4">
+            <div className="w-100" style={{ maxWidth: "400px" }}>
+              <label htmlFor="search-input" className="form-label">Buscar Pokémon</label>
+              <input
+                id="search-input"
+                type="text"
+                onChange={handleSearch}
+                className="form-control"
+                placeholder="Ej. Pikachu"
+              />
+            </div>
+          </div>
+      
+          <InfiniteScroll
+            dataLength={filteredPokemons.length}
+            next={fetchMoreData}
+            hasMore={hasMore}
+            loader={<h4 className="text-center">Cargando...</h4>}
+          >
+            <div className="container">
+              <div className="row justify-content-center">
+                {filteredPokemons &&
+                  filteredPokemons.map((pokemon) => (
+                    <Pokecard key={pokemon.id} pokemon={pokemon} types={[]} />
+                  ))}
+              </div>
+            </div>
+          </InfiniteScroll>
         </div>
-    );
+      );
+      
 }

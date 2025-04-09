@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Pokecard } from '../PokeCard/PokeCard';
 import { PokeAPI } from 'pokeapi-types';
-import './index.css'
+import './Pokedex.css'
 import InfiniteScroll from 'react-infinite-scroll-component';
 import { PokemonService } from '../../services/pokemon-service';
 

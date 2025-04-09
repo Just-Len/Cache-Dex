@@ -1,13 +1,14 @@
 import React, { useEffect, useState } from 'react';
 import { PokeAPI } from 'pokeapi-types';
 import './PokemonStats.css';
+import InfiniteScroll from 'react-infinite-scroll-component';
 
 export function PokemonStats() {
 	const [pokemons, setPokemons] = useState<PokeAPI.Pokemon[]>([]);
 	const [filteredPokemons, setFilteredPokemons] = useState<PokeAPI.Pokemon[]>([]);
 	const [searchFilter, setSearchFilter] = useState("");
 	const [selectedPokemon, setSelectedPokemon] = useState<PokeAPI.Pokemon | null>(null);
-
+	const [hasMore, setHasMore] = useState(true)
 	useEffect(() => {
 		async function getPokemonsFromCache() {
 			const cache = await caches.open("cachedex-api-v1");
@@ -38,7 +39,7 @@ export function PokemonStats() {
 
 	return (
 		<div className="container-fluid py-4">
-			<h1 className="text-center mb-4">Estadísticas fuera de linea</h1>
+			<h1 className="text-center mb-4">Estadsticas fuera de linea</h1>
 
 			<div className="d-flex justify-content-center mb-4">
 				<div className="w-100" style={{ maxWidth: "400px" }}>
@@ -52,19 +53,30 @@ export function PokemonStats() {
 					/>
 				</div>
 			</div>
-
-			<div className="row justify-content-center">
-				{filteredPokemons.map(pokemon => (
-					<div
-						key={pokemon.id}
-						className="pokemon-card"
-						onClick={() => setSelectedPokemon(pokemon)}
-					>
-						<img src={pokemon.sprites.front_default ?? ""} alt={pokemon.name} />
-						<h5 className="text-center">{pokemon.name.toUpperCase()}</h5>
+			<InfiniteScroll
+				dataLength={filteredPokemons.length}
+				next={()=>{}}
+				hasMore={hasMore}
+				loader={
+					<div style={{ textAlign: "center" }}>
+						<img style={{ height: "5em" }} src="image/pikachu-running.gif" alt="Cargando" />
+						<h4 className="text-center">Cargando...</h4>
 					</div>
-				))}
-			</div>
+				}>
+					<div className="row justify-content-center">
+						{filteredPokemons.map(pokemon => (
+							<div
+								key={pokemon.id}
+								className="pokemon-card"
+								onClick={() => setSelectedPokemon(pokemon)}
+									>
+								<img src={pokemon.sprites.front_default ?? ""} alt={pokemon.name} />
+								<h5 className="text-center">{pokemon.name.toUpperCase()}</h5>
+							</div>
+						))}
+					</div>
+				</InfiniteScroll>
+
 
 			{selectedPokemon && (
 				<div className="pokemon-modal-overlay" onClick={() => setSelectedPokemon(null)}>

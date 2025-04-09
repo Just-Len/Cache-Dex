@@ -4,7 +4,7 @@ import { IconTab } from "./components/Home/icon-tab";
 import "react-tabs/style/react-tabs.css";
 import 'bootstrap/dist/css/bootstrap.min.css';
 import "./App.css"
-import { Pokedex } from "./components/Pokedex";
+import { Pokedex } from "./components/Pokedex/Pokedex";
 import { Favorites } from "./components/favorites";
 import { PokemonStats } from "./components/PokemonStats/PokemonStats";
 
@@ -24,7 +24,6 @@ export default function App()
 			<TabPanel>
 				<Favorites/>
 			</TabPanel>
-
 			<TabPanel>
 				<PokemonStats/>
 			</TabPanel>

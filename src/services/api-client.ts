@@ -22,7 +22,7 @@ export class ApiClient
 	private async fetchItems<T>(endpoint: String, count: number, offset: number): Promise<T[]>
 	{
 		const itemPromises: Promise<Response>[] = [];
-		let i = 0;
+		let i = 1;
 		while (i < count) {
 			itemPromises.push(fetch(`${API_URL}/${endpoint}/${offset + i}`));
 			++i;

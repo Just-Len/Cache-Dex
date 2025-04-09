@@ -71,6 +71,11 @@ export class ApiClient
 		return this.fetchFromIndex("pokemon-species", count, offset);
 	}
 
+	async pokemonStats(count = 64, offset = 0): Promise<PokeAPI.Stat[]>
+	{
+		return this.fetchFromIndex("stat", count, offset);
+	}
+
 	// Name: names[index].name
 	async pokemonTypes(count = 64, offset = 0): Promise<PokeAPI.Type[]>
 	{

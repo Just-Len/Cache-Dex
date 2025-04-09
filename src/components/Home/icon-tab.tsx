@@ -1,4 +1,3 @@
-import React from "react";
 import { ReactTabsFunctionComponent, Tab, TabProps } from "react-tabs";
 
 import "./icon-tab.css"

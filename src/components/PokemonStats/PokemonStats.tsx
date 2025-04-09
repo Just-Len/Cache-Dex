@@ -8,7 +8,7 @@ export function PokemonStats() {
 	const [filteredPokemons, setFilteredPokemons] = useState<PokeAPI.Pokemon[]>([]);
 	const [searchFilter, setSearchFilter] = useState("");
 	const [selectedPokemon, setSelectedPokemon] = useState<PokeAPI.Pokemon | null>(null);
-	const [hasMore, setHasMore] = useState(true)
+	const [hasMore] = useState(true)
 	useEffect(() => {
 		async function getPokemonsFromCache() {
 			const cache = await caches.open("cachedex-api-v1");

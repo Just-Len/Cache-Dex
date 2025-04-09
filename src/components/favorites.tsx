@@ -38,12 +38,13 @@ export function Favorites()
 		const pokemonSpeciesRequest = service.pokemonSpecies(offset);
 
 		let [newPokemons, newPokemonSpecies] = await Promise.all([pokemonRequest, pokemonSpeciesRequest]);
+		const allPokemons = [...pokemons, ...newPokemons];
 		setPokemonData({
-			pokemons: [...pokemons, ...newPokemons],
+			pokemons: allPokemons,
 			pokemonSpecies: [...pokemonSpecies, ...newPokemonSpecies],
 			pokemonTypes: newPokemonTypes
 		});
-		setMoar(newPokemons.length > 0);
+		setMoar(allPokemons.length != service.favoriteCount);
 	}
 
 	async function moarPokemons() {

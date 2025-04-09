@@ -30,6 +30,11 @@ export class PokemonService
 		this._pokemonTypes = [];
 	}
 
+	get favoriteCount()
+	{
+		return this._favoriteIds.length;
+	}
+
 	async favoritePokemons(offset: number)
 	{
 		let pokemons: PokeAPI.Pokemon[] = [];

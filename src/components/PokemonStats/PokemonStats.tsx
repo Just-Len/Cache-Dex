@@ -2,29 +2,30 @@ import React, { useEffect, useState } from 'react';
 import { PokeAPI } from 'pokeapi-types';
 import './PokemonStats.css';
 import InfiniteScroll from 'react-infinite-scroll-component';
+import { PokemonService } from '../../services/pokemon-service';
 
 export function PokemonStats() {
+	const pokemonService = new PokemonService();
+
 	const [pokemons, setPokemons] = useState<PokeAPI.Pokemon[]>([]);
 	const [filteredPokemons, setFilteredPokemons] = useState<PokeAPI.Pokemon[]>([]);
 	const [searchFilter, setSearchFilter] = useState("");
 	const [selectedPokemon, setSelectedPokemon] = useState<PokeAPI.Pokemon | null>(null);
-	const [hasMore] = useState(true)
+	const [hasMore, setHasMore] = useState(true);
+    const [offset, setOffset] = useState(0);
+
 	useEffect(() => {
 		async function getPokemonsFromCache() {
-			const cache = await caches.open("cachedex-api-v1");
-			const requests = await cache.keys();
+			const newPokemons = await pokemonService.pokemons(offset);
 
-			const pokemonResponses = await Promise.all(
-				requests.map(req => cache.match(req).then(res => res?.json()))
-			);
-
-			const validPokemons = pokemonResponses.filter(p => p && p.stats && p.types);
-			setPokemons(validPokemons);
-			setFilteredPokemons(validPokemons);
+			const allPokemons = [...pokemons, ...newPokemons];
+			setPokemons(allPokemons);
+			setFilteredPokemons(allPokemons);
+			setHasMore(newPokemons.length > 0);
 		}
 
 		getPokemonsFromCache();
-	}, []);
+	}, [offset]);
 
 	useEffect(() => {
 		const filtered = pokemons.filter(p =>
@@ -37,9 +38,14 @@ export function PokemonStats() {
 		setSearchFilter(event.target.value);
 	}
 
+	async function nextPage() {
+        const newOffset = offset + 50;
+        setOffset(newOffset);
+	}
+
 	return (
 		<div className="container-fluid py-4">
-			<h1 className="text-center mb-4">Estadsticas fuera de linea</h1>
+			<h1 className="text-center mb-4">Estadísticas</h1>
 
 			<div className="d-flex justify-content-center mb-4">
 				<div className="w-100" style={{ maxWidth: "400px" }}>
@@ -55,7 +61,7 @@ export function PokemonStats() {
 			</div>
 			<InfiniteScroll
 				dataLength={filteredPokemons.length}
-				next={()=>{}}
+				next={nextPage}
 				hasMore={hasMore}
 				loader={
 					<div style={{ textAlign: "center" }}>

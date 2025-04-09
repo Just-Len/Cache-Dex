@@ -19,6 +19,22 @@ interface IndexItem
 
 export class ApiClient
 {
+	private async fetchItems<T>(endpoint: String, count: number, offset: number): Promise<T[]>
+	{
+		const itemPromises: Promise<Response>[] = [];
+		let i = 1;
+		while (i < count) {
+			itemPromises.push(fetch(`${API_URL}/${endpoint}/${offset + i}`));
+			++i;
+		}
+		const itemResponses = await Promise.all(itemPromises);
+		const items: T[] = await Promise.all(
+			itemResponses.filter(response => response.ok).map(response => response.json())
+		);
+
+		return items;
+	}
+
 	private async fetchFromIndex<T>(endpoint: String, count: number, offset: number): Promise<T[]>
 	{
 		const indexResponse = await fetch(`${API_URL}/${endpoint}?limit=${count}&offset=${offset}`);
@@ -55,20 +71,20 @@ export class ApiClient
 	// Name: names[index].name
 	async moves(count = 64, offset = 0): Promise<PokeAPI.Move[]>
 	{
-		return this.fetchFromIndex("move", count, offset);
+		return this.fetchItems("move", count, offset);
 	}
 
 	// Localized name is in PokemonSpecies, not here
 	// Image: sprites.other["official-artwork"].front_default
 	async pokemon(count = 64, offset = 0): Promise<PokeAPI.Pokemon[]>
 	{
-		return this.fetchFromIndex("pokemon", count, offset);
+		return this.fetchItems("pokemon", count, offset);
 	}
 
 	// Name: names[index].name
 	async pokemonSpecies(count = 64, offset = 0): Promise<PokeAPI.PokemonSpecies[]>
 	{
-		return this.fetchFromIndex("pokemon-species", count, offset);
+		return this.fetchItems("pokemon-species", count, offset);
 	}
 
 	async pokemonStats(count = 64, offset = 0): Promise<PokeAPI.Stat[]>

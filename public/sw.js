@@ -1,118 +1,110 @@
-import React, { useEffect, useState } from "react";
-import { PokeAPI } from "pokeapi-types";
+const API_URL = "https://pokeapi.co";
+const CACHE_NAME = "cachedex-v1";
+const API_CACHE_NAME = "cachedex-api-v1";
+const CACHE_PATHS = [
+    "/",
+    "index.html",
+    "main.js",
+	"image/floppy-disk.png",
+	"image/pokedex.png",
+	"image/pokemon-shiny.png",
+];
 
-interface StatsProps {
-  pokemon: PokeAPI.Pokemon;
-}
+self.addEventListener("install", event => {
+	self.skipWaiting();
 
-export const PokemonStats: React.FC<StatsProps> = ({ pokemon }) => {
-  if (!pokemon || !pokemon.moves || !Array.isArray(pokemon.moves)) return <p className="text-danger">No se pudieron cargar los datos del Pokémon.</p>;
+    const promise = caches
+        .open(CACHE_NAME)
+        .then(cache => {
+            console.log("Service worker activated")
+            return cache.addAll(CACHE_PATHS)
+        })
 
-  const firstMove = pokemon.moves[0]?.move?.name;
+    event.waitUntil(promise)
+})
 
-  return (
-    <div className="card p-3 mt-3">
-      <h4 className="mb-3">Información de {pokemon.name.toUpperCase()}</h4>
-
-      <ul className="list-group list-group-flush">
-        <li className="list-group-item d-flex justify-content-between">
-          <strong>ID</strong>
-          <span>{pokemon.id}</span>
-        </li>
-        <li className="list-group-item d-flex justify-content-between">
-          <strong>Altura</strong>
-          <span>{pokemon.height}</span>
-        </li>
-        <li className="list-group-item d-flex justify-content-between">
-          <strong>Peso</strong>
-          <span>{pokemon.weight}</span>
-        </li>
-        <li className="list-group-item d-flex justify-content-between">
-          <strong>Tipo(s)</strong>
-          <span>{pokemon.types.map(t => t.type.name).join(", ")}</span>
-        </li>
-        <li className="list-group-item d-flex justify-content-between">
-          <strong>Primer Movimiento</strong>
-          <span>{firstMove || "Desconocido"}</span>
-        </li>
-      </ul>
-    </div>
-  );
-};
-
-export const CacheDex: React.FC = () => {
-  const [cachedPokemons, setCachedPokemons] = useState<PokeAPI.Pokemon[]>([]);
-  const [selectedPokemon, setSelectedPokemon] = useState<PokeAPI.Pokemon | null>(null);
-  const [error, setError] = useState<string | null>(null);
-
-  useEffect(() => {
-    async function getCached() {
-      try {
-        const cache = await caches.open("cachedex-api-v1");
-        const keys = await cache.keys();
-        const results = await Promise.all(
-          keys.map(async (req) => {
-            const res = await cache.match(req);
-            if (!res) return null;
-            try {
-              return await res.json();
-            } catch (e) {
-              console.warn("Invalid JSON in cache:", req.url);
-              return null;
+self.addEventListener("fetch", event => {
+    const promise = caches
+        .match(event.request)
+        .then(async response => {
+            const url = event.request.url
+            console.log(`Resource at ${url} requested`)
+            if (response) {
+                console.log("Cache hit!")
+                return response
             }
-          })
-        );
 
-        const isValidPokemon = (p: any): p is PokeAPI.Pokemon => {
-          return (
-            p &&
-            typeof p.name === "string" &&
-            Array.isArray(p.moves) &&
-            p.moves.length > 0
-          );
-        };
+			console.log("Cache miss :(")
+			const externalResponse = await fetch(event.request)
+			if (url.startsWith(API_URL) && externalResponse.ok) {
+				const cache = await caches.open(API_CACHE_NAME)
+				await cache.put(event.request, externalResponse.clone())
+			}
 
-        const uniqueValidPokemons = results.filter((p, index, self) =>
-          isValidPokemon(p) &&
-          self.findIndex(other => other?.id === p.id) === index
-        );
+            return externalResponse;
+		})
 
-        setCachedPokemons(uniqueValidPokemons);
-      } catch (err) {
-        setError("Hubo un problema al leer el caché.");
-        console.error(err);
-      }
-    }
-    getCached();
-  }, []);
+    event.respondWith(promise)
+})
 
-  return (
-    <div className="container py-4">
-      <h2 className="text-center mb-4">Pokémons en Caché</h2>
-      {error && <div className="alert alert-danger text-center">{error}</div>}
-      <div className="row">
-        <div className="col-md-4">
-          <ul className="list-group">
-            {cachedPokemons.map((p, i) => (
-              <li
-                key={`${p.id}-${i}`}
-                className="list-group-item list-group-item-action"
-                style={{ cursor: "pointer" }}
-                onClick={() => setSelectedPokemon(p)}
-              >
-                {p.name?.toUpperCase?.() || "(sin nombre)"}
-              </li>
-            ))}
-          </ul>
-        </div>
-        <div className="col-md-8">
-          {selectedPokemon ? (
-            <PokemonStats pokemon={selectedPokemon} />
-          ) : (
-            <p className="text-center">Selecciona un Pokémon para ver sus estadísticas</p>
-          )}
-        </div>
-      </div>
-    </div>
-  );
-};
+self.addEventListener("activate", (event) => {
+    const promise = caches
+        .keys()
+        .then(cacheNames => {
+            const promises = cacheNames.map(name => {
+                if (name !== CACHE_NAME && name != API_CACHE_NAME) {
+                    console.log("Deleting old cache: ", name)
+                    return caches.delete(name);
+                }
+
+                return Promise.resolve(false)
+            })
+
+            return Promise.all(promises);
+        })
+
+    event.waitUntil(promise)
+})
+
+//Se guardan solo las url? o todo el pokemon con detalles? usando localstorage?
+
+//function to get pokemons in cache
+async function getPokemonsInCache() {
+    
+	const cache = await caches.open(API_CACHE_NAME);
+	const requests = await cache.keys();
+
+	return Promise.all(
+		requests.map(req => cache.match(req).then(res => res.json()))
+	);
+}
+//Function to delete pokemons in cache
+async function deleteCache() {
+
+	try {
+		const cache = await caches.open(API_CACHE_NAME);
+		const keys = await cache.keys();
+
+		await Promise.all(keys.map(request => cache.delete(request)));
+
+		console.log("Pokemons in cache removed");
+	} catch (error) {
+		console.error("Error: ", error);
+	}
+}
+//function to delete an especific pokemon from cache
+async function deletePokemon(pokemonUrl) {
+
+	try {
+		const cache = await caches.open(API_CACHE_NAME);
+		const eliminado = await cache.delete(pokemonUrl);
+
+		if (eliminado) {
+			console.log(`Pokemon removed: ${pokemonUrl}`);
+		} else {
+			console.warn(`Pokemon not found: ${pokemonUrl}`);
+		}
+	} catch (error) {
+		console.error("Error while trying to remove the pokemon:", error);
+	}
+}

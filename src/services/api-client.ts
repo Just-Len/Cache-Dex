@@ -81,11 +81,6 @@ export class ApiClient
 	{
 		return this.fetchFromIndex("type", count, offset);
 	}
-	async getPokemonByName(name: string): Promise<PokeAPI.Pokemon> {
-	const url = `${API_URL}/pokemon/${name}`;
-	const res = await fetch(url);
-	if (!res.ok) throw new Error("Pokémon no encontrado");
-	return await res.json();
-}
+
 
 }

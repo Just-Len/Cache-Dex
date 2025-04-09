@@ -88,7 +88,7 @@ export function Pokedex()
 	const filteredPokemons = filterPokemons(searchFilter);
 
 	return (
-		<div className="container-fluid py-4">
+		<div className="container-fluid py-4 bg-dark">
 			<h1 className="text-center mb-4">Pokédex</h1>
 
 			<div className="d-flex justify-content-center mb-4">

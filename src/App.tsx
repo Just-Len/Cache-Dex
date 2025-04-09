@@ -6,6 +6,7 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import "./App.css"
 import { Pokedex } from "./components/Pokedex";
 import { Favorites } from "./components/favorites";
+import { PokemonStats } from "./components/PokemonStats/PokemonStats";
 
 export default function App()
 {
@@ -25,7 +26,7 @@ export default function App()
 			</TabPanel>
 
 			<TabPanel>
-				<h1 style={{ textAlign: "center" }}>Todavía nada por aquí (Len)</h1>
+				<PokemonStats/>
 			</TabPanel>
 		</Tabs>
 	);

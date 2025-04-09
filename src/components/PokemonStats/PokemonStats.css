@@ -1,0 +1,60 @@
+.pokemon-card {
+	width: 150px;
+	margin: 10px;
+	padding: 10px;
+	border: 1px solid #ccc;
+	border-radius: 12px;
+	text-align: center;
+	cursor: pointer;
+	transition: transform 0.2s ease;
+	background: #2d2d2d;
+}
+
+.pokemon-card:hover {
+	transform: scale(1.05);
+}
+
+.pokemon-modal-overlay {
+	position: fixed;
+	top: 0;
+	left: 0;
+	right: 0;
+	bottom: 0;
+	background-color: rgba(0, 0, 0, 0.5);
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	z-index: 1000;
+}
+
+.pokemon-modal-content {
+	background: #626262;
+	padding: 2rem;
+	border-radius: 1rem;
+	width: 90%;
+	max-width: 400px;
+	position: relative;
+	box-shadow: 0 0 15px rgba(0,0,0,0.3);
+}
+
+.close-button {
+	position: absolute;
+	top: 0.5rem;
+	right: 0.5rem;
+	border: none;
+	background: none;
+	font-size: 1.2rem;
+	cursor: pointer;
+}
+
+.modal-pokemon-image {
+	width: 120px;
+	height: 120px;
+	display: block;
+	margin: 1rem auto;
+}
+
+.stats-list {
+	list-style: none;
+	padding: 0;
+}

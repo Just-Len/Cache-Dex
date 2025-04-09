@@ -11,6 +11,7 @@ export class PokemonService
 	private _favoritePokemons: PokeAPI.Pokemon[];
 	private _pokemons: PokeAPI.Pokemon[];
 	private _pokemonSpecies: PokeAPI.PokemonSpecies[];
+	private _pokemonStats: PokeAPI.Stat[];
 	private _pokemonTypes: PokeAPI.Type[];
 
 	constructor()
@@ -25,6 +26,7 @@ export class PokemonService
 		this._favoritePokemons = [];
 		this._pokemons = [];
 		this._pokemonSpecies = [];
+		this._pokemonStats = [];
 		this._pokemonTypes = [];
 	}
 
@@ -85,6 +87,15 @@ export class PokemonService
 		}
 
 		return this._pokemonTypes;
+	}
+
+	async stats(): Promise<PokeAPI.Stat[]>
+	{
+		if (this._pokemonStats.length == 0) {
+			this._pokemonStats = await this._apiClient.pokemonStats(100);
+		}
+
+		return this._pokemonStats;
 	}
 
     unsetFavorite(pokemon: PokeAPI.Pokemon): boolean

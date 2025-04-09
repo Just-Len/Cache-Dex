@@ -81,20 +81,20 @@ export function Favorites()
     return (
         <div className='container-fluid'>
             <h1 className='text-center'>Pokémon favoritos</h1>
-            <InfiniteScroll
-              dataLength={pokemons.length}
-              next={moarPokemons}
-              hasMore={moar}
-              loader={
+			<InfiniteScroll
+			  dataLength={pokemons.length}
+			  next={moarPokemons}
+			  hasMore={moar}
+			  loader={
 				  <div style={{ textAlign: "center" }}>
-				  	  <img style={{ height: "5em" }} src="image/pikachu-running.gif"/>
+					  <img style={{ height: "5em" }} src="image/pikachu-running.gif"/>
 					  <h4 className='text-center'>Cargando</h4>
 				  </div>
 			  }>
 				<div className="row justify-content-center">
 					{ pokemonList() }
-                </div>
-            </InfiniteScroll>
+				</div>
+			</InfiniteScroll>
         </div>
     );
 }

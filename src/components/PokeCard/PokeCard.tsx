@@ -1,24 +1,23 @@
-import { PokeAPI } from "pokeapi-types";
 import './PokeCard.css'
 import { useState } from "react";
+import { languageIdFor, Pokemon } from "../../typedef";
 
 interface PokecardProps
 {
-	pokemon: PokeAPI.Pokemon;
-	species?: PokeAPI.PokemonSpecies;
-	types: PokeAPI.Type[];
-	favoriteAction: (pokemon: PokeAPI.Pokemon) => void;
+	pokemon: Pokemon;
+	favoriteAction: (pokemon: Pokemon) => void;
 }
 
 
-export function Pokecard({ pokemon, species, types, favoriteAction }: PokecardProps)
+export function Pokecard({ pokemon, favoriteAction }: PokecardProps)
 {
 	// I don't care about typing here anymore
 	const [favorite, setFavorite] = useState((pokemon as any).favorite || false);
+	const languageId = languageIdFor(navigator.languages[0]);
 
 	let favoriteButtonText;
 	let name = pokemon.name;
-	let typeName = pokemon.types[0].type.name;
+	let typeName = pokemon.types[0].name;
 	let spriteUrl: string | undefined;
 
 	if (favorite) {
@@ -28,19 +27,19 @@ export function Pokecard({ pokemon, species, types, favoriteAction }: PokecardPr
 		favoriteButtonText = "Agregar a favoritos";
 	}
 
-	if (species) {
-		const speciesLocalizedName = species.names.find(name => name.language.name == "es");
+	if (pokemon.species) {
+		const speciesLocalizedName = pokemon.species.names.get(languageId);
 
 		if (speciesLocalizedName) {
-			name = speciesLocalizedName.name;
+			name = speciesLocalizedName;
 		}
 	}
 
-	if (types.length > 0) {
-		const typeLocalizedName = types[0].names.find(name => name.language.name == "es");
+	if (pokemon.types.length > 0) {
+		const typeLocalizedName = pokemon.types[0].names.get(languageId);
 
 		if (typeLocalizedName) {
-			typeName = typeLocalizedName.name;
+			typeName = typeLocalizedName;
 		}
 	}
 	

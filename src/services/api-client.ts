@@ -1,102 +1,117 @@
-import { PokeAPI } from "pokeapi-types";
+import { Pokemon } from "../typedef";
 
-const API_URL = "https://pokeapi.co/api/v2";
-
-interface PaginatedResponse<T>
-{
-	count: number;
-	next?: String;
-	previous?: String;
-	name: String;
-	results: T[];
-}
-
-interface IndexItem
-{
-	name: String;
-	url: String;
-}
+const API_URL = "https://beta.pokeapi.co/graphql/v1beta";
 
 export class ApiClient
 {
-	private async fetchItems<T>(endpoint: String, count: number, offset: number): Promise<T[]>
-	{
-		const itemPromises: Promise<Response>[] = [];
-		let i = 1;
-		while (i < count) {
-			itemPromises.push(fetch(`${API_URL}/${endpoint}/${offset + i}`));
-			++i;
-		}
-		const itemResponses = await Promise.all(itemPromises);
-		const items: T[] = await Promise.all(
-			itemResponses.filter(response => response.ok).map(response => response.json())
-		);
-
-		return items;
-	}
-
-	private async fetchFromIndex<T>(endpoint: String, count: number, offset: number): Promise<T[]>
-	{
-		const indexResponse = await fetch(`${API_URL}/${endpoint}?limit=${count}&offset=${offset}`);
-		if (!indexResponse.ok) {
-			throw new Error("Couldn't fetch index");
-		}
-
-		const index: PaginatedResponse<IndexItem> = await indexResponse.json();
-		const itemPromises = index.results.map(item => fetch(item.url as any));
-		const itemResponses = await Promise.all(itemPromises);
-		const items: T[] = await Promise.all(
-			itemResponses.filter(response => response.ok).map(response => response.json())
-		);
-
-		return items;
-	}
-
 	async pokemonCount(): Promise<number>
 	{
-		const indexResponse = await fetch(`${API_URL}/pokemon?limit=1`);
-		if (!indexResponse.ok) {
-			throw new Error("Couldn't fetch index");
+		const query = `#graphql
+			query pokemonCount {
+				count: pokemon_v2_pokemon_aggregate {
+					aggregate {
+						count
+					}
+				}
+			}
+		`;
+
+		const response = await fetch(API_URL, {
+			method: "POST",
+			body: JSON.stringify({ operationName: "pokemonCount", query: `${query}` })
+		});
+		const payload = await response.json();
+		return payload.data.count.aggregate.count;
+	}
+	async pokemon(count = 64, offset = 0): Promise<Pokemon[]>
+	{
+		const query = `#graphql
+			query pokemons {
+				pokemons: pokemon_v2_pokemon(
+					limit: ${count},
+					offset: ${offset}
+				) {
+					stats: pokemon_v2_pokemonstats {
+						stat: pokemon_v2_stat {
+							names: pokemon_v2_statnames(
+							where: { pokemon_v2_language: { name: { _in: ["es", "en", "ja-Hrkt"] } } }
+							) {
+								language_id
+								name
+								}
+							}
+
+							stat_id
+							base_stat
+						}
+					types: pokemon_v2_pokemontypes {
+						id
+						type: pokemon_v2_type {
+							names: pokemon_v2_typenames(
+								where: { pokemon_v2_language: { name: { _in: ["es", "en", "ja-Hrkt"] } } }
+							) {
+								language_id
+								name
+							}
+							name
+						}
+					}
+					species: pokemon_v2_pokemonspecy {
+						names: pokemon_v2_pokemonspeciesnames(
+							where: { pokemon_v2_language: { name: { _in: ["es", "en", "ja-Hrkt"] } } }
+						) {
+							language_id
+							name
+						}
+
+						id
+						name
+					}
+					sprites: pokemon_v2_pokemonsprites {
+						sprites
+					}
+
+					id
+					name
+				}
+			}
+		`;
+
+		const response = await fetch(API_URL, {
+			method: "POST",
+			body: JSON.stringify({ operationName: "pokemons", query: `${query}` })
+		});
+		const payload = await response.json();
+		const pokemons: any[] = payload.data.pokemons;
+
+		for (const pokemon of pokemons) {
+			pokemon.favorite = false;
+			const speciesNames = new Map<number, string>();
+			for (let species_name of pokemon.species.names) {
+				speciesNames.set(species_name.language_id, species_name.name);
+			}
+			pokemon.species.names = speciesNames;
+
+			for (const stat of pokemon.stats) {
+				const names = new Map<number, string>();
+				for (const stat_name of stat.stat.names) {
+					names.set(stat_name.language_id, stat_name.name);
+				}
+				stat.names = names;
+				stat.stat = undefined;
+			}
+			for (let type of pokemon.types) {
+				const names = new Map<number, string>();
+				for (const type_name of type.type.names) {
+					names.set(type_name.language_id, type_name.name);
+				}
+				type.names = names;
+				type.type = undefined;
+			}
+
+			pokemon.sprites = pokemon.sprites[0].sprites;
 		}
-
-		const index: PaginatedResponse<IndexItem> = await indexResponse.json();
-		return index.count;
+		return pokemons;
 	}
-
-	async allPokemon()
-	{
-		
-	}
-
-	// Name: names[index].name
-	async moves(count = 64, offset = 0): Promise<PokeAPI.Move[]>
-	{
-		return this.fetchItems("move", count, offset);
-	}
-
-	// Localized name is in PokemonSpecies, not here
-	// Image: sprites.other["official-artwork"].front_default
-	async pokemon(count = 64, offset = 0): Promise<PokeAPI.Pokemon[]>
-	{
-		return this.fetchItems("pokemon", count, offset);
-	}
-
-	// Name: names[index].name
-	async pokemonSpecies(count = 64, offset = 0): Promise<PokeAPI.PokemonSpecies[]>
-	{
-		return this.fetchItems("pokemon-species", count, offset);
-	}
-
-	async pokemonStats(count = 64, offset = 0): Promise<PokeAPI.Stat[]>
-	{
-		return this.fetchFromIndex("stat", count, offset);
-	}
-
-	// Name: names[index].name
-	async pokemonTypes(count = 64, offset = 0): Promise<PokeAPI.Type[]>
-	{
-		return this.fetchFromIndex("type", count, offset);
-	}
-
-
 }
+

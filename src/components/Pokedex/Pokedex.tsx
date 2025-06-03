@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import { Pokecard } from '../PokeCard/PokeCard';
-import { PokeAPI } from 'pokeapi-types';
 import './Pokedex.css'
 import InfiniteScroll from 'react-infinite-scroll-component';
 import { PokemonService } from '../../services/pokemon-service';
+import { Pokemon } from '../../typedef';
 
 export function Pokedex()
 {
@@ -12,24 +12,14 @@ export function Pokedex()
 	const [hasMore, setHasMore] = useState(true);
 	const [index, setIndex] = useState(0);
 	const [searchFilter, setSearchFilter] = useState("");
-	const [pokemons, setPokemons] = useState<PokeAPI.Pokemon[]>([]);
-	const [pokemonSpecies, setPokemonSpecies] = useState<PokeAPI.PokemonSpecies[]>([]);
-	const [pokemonTypes, setPokemonTypes] = useState<PokeAPI.Type[]>([]);
+	const [pokemons, setPokemons] = useState<Pokemon[]>([]);
 
 	const fetchPokemons = async (offset: number) => {
-		const pokemonRequest = service.pokemons(offset);
-		const pokemonSpeciesRequest = service.pokemonSpecies(offset);
+		const newPokemons = await service.pokemons(offset);
 
-		await Promise.all([pokemonRequest, pokemonSpeciesRequest]);
-		const newPokemons = await pokemonRequest;
-		setPokemonSpecies([...pokemonSpecies, ...(await pokemonSpeciesRequest)]);
 		setPokemons([...pokemons, ...newPokemons]);
 		setHasMore(newPokemons.length > 0);
 	};
-
-	useEffect(() => {
-		service.types().then(types => setPokemonTypes(types));
-	}, []);
 
 	useEffect(() => {
 		fetchPokemons(index);
@@ -54,7 +44,7 @@ export function Pokedex()
 		}
 	}
 
-	function toggleFavorite(pokemon: PokeAPI.Pokemon) { 
+	function toggleFavorite(pokemon: Pokemon) { 
 		if ((pokemon as any).favorite) {
 			service.unsetFavorite(pokemon);
 		}
@@ -67,20 +57,14 @@ export function Pokedex()
 		setSearchFilter(event.target.value);
 	}
 
-	function pokemonList(pokemons: PokeAPI.Pokemon[]) {
+	function pokemonList(pokemons: Pokemon[]) {
 		if (pokemons.length == 0) {
 			return undefined;
 		}
 
 		return pokemons.map(pokemon => {
-			const species = pokemonSpecies.find(species => species.name == pokemon.species.name);
-
-			const types = pokemonTypes.filter(
-				type => pokemon.types.find(pokemonType => pokemonType.type.name == type.name)
-			);
 			return (
-				<Pokecard	key={pokemon.id} pokemon={pokemon}
-							species={species} types={types} favoriteAction={toggleFavorite} />
+				<Pokecard key={pokemon.id} pokemon={pokemon} favoriteAction={toggleFavorite} />
 			)
 		});
 	}

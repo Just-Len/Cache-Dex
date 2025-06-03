@@ -11,9 +11,6 @@ importers:
       bootstrap:
         specifier: ^5.3.5
         version: 5.3.5(@popperjs/core@2.11.8)
-      pokeapi-types:
-        specifier: ^0.0.2
-        version: 0.0.2
       react:
         specifier: ^19.0.0
         version: 19.1.0
@@ -946,9 +943,6 @@ packages:
   picomatch@2.3.1:
     resolution: {integrity: sha512-JU3teHTNjmE2VCGFzuY8EXzCDVwEqB2a8fsIvwaStHhAWJEeVd1o1QD80CU6+ZdEXXSLbSsuLwJjkCBWqRQUVA==}
     engines: {node: '>=8.6'}
-
-  pokeapi-types@0.0.2:
-    resolution: {integrity: sha512-yg/ZMEILjBiF6Af1lGXfSXYi5WEUUlFi6tDKxKmW6lOvdYsp1H3oNL++rKq/32Zsp6MgOig4Xltz9txYnryFpw==}
 
   postcss@8.5.3:
     resolution: {integrity: sha512-dle9A3yYxlBSrt8Fu+IpjGT8SY8hN0mlaA6GY8t0P5PjIOZemULz/E2Bnm/2dcUOena75OTNkHI76uZBNUUq3A==}
@@ -1987,8 +1981,6 @@ snapshots:
   picocolors@1.1.1: {}
 
   picomatch@2.3.1: {}
-
-  pokeapi-types@0.0.2: {}
 
   postcss@8.5.3:
     dependencies:

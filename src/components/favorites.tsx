@@ -1,15 +1,8 @@
-import { PokeAPI } from "pokeapi-types";
 import { useEffect, useState } from "react";
 import { PokemonService } from "../services/pokemon-service";
 import InfiniteScroll from "react-infinite-scroll-component";
 import { Pokecard } from "./PokeCard/PokeCard";
-
-interface PokemonListData
-{
-	pokemons: PokeAPI.Pokemon[];
-	pokemonSpecies: PokeAPI.PokemonSpecies[];
-	pokemonTypes: PokeAPI.Type[];
-}
+import { Pokemon } from "../typedef";
 
 export function Favorites()
 {
@@ -17,33 +10,16 @@ export function Favorites()
 
     const [moar, setMoar] = useState(true);
     const [listOffset, setListOffset] = useState(0);
-	const [pokemonData, setPokemonData] = useState<PokemonListData>({
-		pokemons: [], pokemonSpecies: [], pokemonTypes: []
-	});
-
-	const pokemons = pokemonData.pokemons;
-	const pokemonSpecies = pokemonData.pokemonSpecies;
-	const pokemonTypes = pokemonData.pokemonTypes;
+	const [pokemons, setPokemons] = useState<Pokemon[]>([]);
 
 	useEffect(() => {
 		loadPokemons(listOffset);
 	}, [listOffset]);
 
 	async function loadPokemons(offset: number) {
-		let newPokemonTypes = pokemonTypes;
-		if (pokemonTypes.length == 0) {
-			newPokemonTypes = await service.types();
-		}
-		const pokemonRequest = service.favoritePokemons(offset);
-		const pokemonSpeciesRequest = service.pokemonSpecies(offset);
-
-		let [newPokemons, newPokemonSpecies] = await Promise.all([pokemonRequest, pokemonSpeciesRequest]);
+		const newPokemons = await service.favoritePokemons(offset);
 		const allPokemons = [...pokemons, ...newPokemons];
-		setPokemonData({
-			pokemons: allPokemons,
-			pokemonSpecies: [...pokemonSpecies, ...newPokemonSpecies],
-			pokemonTypes: newPokemonTypes
-		});
+		setPokemons(allPokemons);
 		setMoar(allPokemons.length != service.favoriteCount);
 	}
 
@@ -58,25 +34,15 @@ export function Favorites()
 		}
 
 		return pokemons.map(pokemon => {
-			const species = pokemonSpecies.find(species => species.name == pokemon.species.name);
-
-			const types = pokemonTypes.filter(
-				type => pokemon.types.find(pokemonType => pokemonType.type.name == type.name)
-			);
 			return (
-				<Pokecard	key={pokemon.id} pokemon={pokemon}
-							species={species} types={types} favoriteAction={removeFavorite} />
+				<Pokecard key={pokemon.id} pokemon={pokemon} favoriteAction={removeFavorite} />
 			)
 		});
 	}
 
-	function removeFavorite(pokemon: PokeAPI.Pokemon) { 
+	function removeFavorite(pokemon: Pokemon) { 
 		service.unsetFavorite(pokemon);
-		setPokemonData({
-			pokemons: pokemons.filter(p => p.id != pokemon.id),
-			pokemonSpecies: pokemonSpecies,
-			pokemonTypes: pokemonTypes
-		});
+		setPokemons(pokemons.filter(p => p.id != pokemon.id));
 	}
 
     return (

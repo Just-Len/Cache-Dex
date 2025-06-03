@@ -1,16 +1,19 @@
 import React, { useEffect, useState } from 'react';
-import { PokeAPI } from 'pokeapi-types';
-import './PokemonStats.css';
 import InfiniteScroll from 'react-infinite-scroll-component';
 import { PokemonService } from '../../services/pokemon-service';
+import { languageIdFor, Pokemon } from '../../typedef';
 
-export function PokemonStats() {
+import './PokemonStats.css';
+
+export function PokemonStats()
+{
 	const pokemonService = new PokemonService();
+	const languageId = languageIdFor(navigator.languages[0]);
 
-	const [pokemons, setPokemons] = useState<PokeAPI.Pokemon[]>([]);
-	const [filteredPokemons, setFilteredPokemons] = useState<PokeAPI.Pokemon[]>([]);
+	const [pokemons, setPokemons] = useState<Pokemon[]>([]);
+	const [filteredPokemons, setFilteredPokemons] = useState<Pokemon[]>([]);
 	const [searchFilter, setSearchFilter] = useState("");
-	const [selectedPokemon, setSelectedPokemon] = useState<PokeAPI.Pokemon | null>(null);
+	const [selectedPokemon, setSelectedPokemon] = useState<Pokemon | null>(null);
 	const [hasMore, setHasMore] = useState(true);
     const [offset, setOffset] = useState(0);
 
@@ -74,33 +77,37 @@ export function PokemonStats() {
 							<div
 								key={pokemon.id}
 								className="pokemon-card"
-								onClick={() => setSelectedPokemon(pokemon)}
-									>
+								onClick={() => setSelectedPokemon(pokemon)}>
 								<img src={pokemon.sprites.front_default ?? ""} alt={pokemon.name} />
-								<h5 className="text-center">{pokemon.name.toUpperCase()}</h5>
+								<h5 className="text-center">{ pokemon.species.names.get(languageId) }</h5>
 							</div>
 						))}
 					</div>
 				</InfiniteScroll>
 
 
-			{selectedPokemon && (
-				<div className="pokemon-modal-overlay" onClick={() => setSelectedPokemon(null)}>
-					<div className="pokemon-modal-content" onClick={e => e.stopPropagation()}>
-						<button className="close-button" onClick={() => setSelectedPokemon(null)}>✖</button>
-						<h2 className="text-center">{selectedPokemon.name.toUpperCase()}</h2>
-						<img src={selectedPokemon.sprites.front_default ?? ""} alt={selectedPokemon.name} className="modal-pokemon-image" />
-						<h4>Estadísticas:</h4>
-						<ul className="stats-list">
-							{selectedPokemon.stats.map(stat => (
-								<li key={stat.stat.name}>
-									<strong>{stat.stat.name.toUpperCase()}:</strong> {stat.base_stat}
-								</li>
-							))}
-						</ul>
+			{
+				selectedPokemon && (
+					<div className="pokemon-modal-overlay" onClick={() => setSelectedPokemon(null)}>
+						<div className="pokemon-modal-content" onClick={e => e.stopPropagation()}>
+							<button className="close-button" onClick={() => setSelectedPokemon(null)}>✖</button>
+							<h2 className="text-center">{selectedPokemon.species.names.get(languageId)}</h2>
+							<img src={selectedPokemon.sprites.front_default ?? ""} alt={selectedPokemon.species.names.get(languageId)} className="modal-pokemon-image" />
+							<h4>Estadísticas:</h4>
+							<ul className="stats-list">
+								{
+									selectedPokemon.stats.map(stat => (
+
+										<li key={stat.name}>
+											<strong>{stat.names.get(languageId)}:</strong> {stat.base_stat}
+										</li>
+									))
+								}
+							</ul>
+						</div>
 					</div>
-				</div>
-			)}
+				)
+			}
 		</div>
 	);
 }

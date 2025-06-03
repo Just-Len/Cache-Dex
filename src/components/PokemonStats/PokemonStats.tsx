@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import InfiniteScroll from 'react-infinite-scroll-component';
 import { PokemonService } from '../../services/pokemon-service';
 import { languageIdFor, Pokemon } from '../../typedef';
@@ -11,39 +11,45 @@ export function PokemonStats()
 	const languageId = languageIdFor(navigator.languages[0]);
 
 	const [pokemons, setPokemons] = useState<Pokemon[]>([]);
-	const [filteredPokemons, setFilteredPokemons] = useState<Pokemon[]>([]);
 	const [searchFilter, setSearchFilter] = useState("");
 	const [selectedPokemon, setSelectedPokemon] = useState<Pokemon | null>(null);
 	const [hasMore, setHasMore] = useState(true);
-    const [offset, setOffset] = useState(0);
+	const abortControllerRef = useRef<AbortController | null>(null);
+	const offsetRef = useRef<number>(0);
 
-	useEffect(() => {
-		async function getPokemonsFromCache() {
-			const newPokemons = await pokemonService.pokemons(offset);
-
-			const allPokemons = [...pokemons, ...newPokemons];
-			setPokemons(allPokemons);
-			setFilteredPokemons(allPokemons);
-			setHasMore(newPokemons.length > 0);
+	async function getPokemonsFromCache() {
+		const currAbortController = abortControllerRef.current;
+		if (currAbortController != null) {
+			currAbortController.abort();
 		}
+		abortControllerRef.current = new AbortController();
 
-		getPokemonsFromCache();
-	}, [offset]);
+		const abortSignal = abortControllerRef.current.signal;
+
+		const newPokemons = await pokemonService.pokemons(offsetRef.current, searchFilter, abortSignal);
+		if (abortSignal.aborted) {
+			return;
+		}
+		abortControllerRef.current = null;
+
+		setPokemons(current => [...current, ...newPokemons]);
+		setHasMore(newPokemons.length > 0);
+	}
 
 	useEffect(() => {
-		const filtered = pokemons.filter(p =>
-			p.name.toLowerCase().includes(searchFilter.toLowerCase())
-		);
-		setFilteredPokemons(filtered);
-	}, [searchFilter, pokemons]);
+		setPokemons([]);
+		offsetRef.current = 0;
+		
+		getPokemonsFromCache();
+	}, [searchFilter]);
 
 	function handleSearch(event: React.ChangeEvent<HTMLInputElement>) {
 		setSearchFilter(event.target.value);
 	}
 
 	async function nextPage() {
-        const newOffset = offset + 50;
-        setOffset(newOffset);
+        offsetRef.current += 50;
+        getPokemonsFromCache();
 	}
 
 	return (
@@ -63,7 +69,7 @@ export function PokemonStats()
 				</div>
 			</div>
 			<InfiniteScroll
-				dataLength={filteredPokemons.length}
+				dataLength={pokemons.length}
 				next={nextPage}
 				hasMore={hasMore}
 				loader={
@@ -73,7 +79,7 @@ export function PokemonStats()
 					</div>
 				}>
 					<div className="row justify-content-center">
-						{filteredPokemons.map(pokemon => (
+						{pokemons.map(pokemon => (
 							<div
 								key={pokemon.id}
 								className="pokemon-card"

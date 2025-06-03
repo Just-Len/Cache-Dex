@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { Pokecard } from '../PokeCard/PokeCard';
 import './Pokedex.css'
 import InfiniteScroll from 'react-infinite-scroll-component';
@@ -10,42 +10,47 @@ export function Pokedex()
 	const service = new PokemonService();
 
 	const [hasMore, setHasMore] = useState(true);
-	const [index, setIndex] = useState(0);
 	const [searchFilter, setSearchFilter] = useState("");
 	const [pokemons, setPokemons] = useState<Pokemon[]>([]);
+	const abortController = useRef<AbortController | null>(null);
+	const indexRef = useRef<number>(0);
 
 	const fetchPokemons = async (offset: number) => {
-		const newPokemons = await service.pokemons(offset);
+		const currAbortController = abortController.current;
+		if (currAbortController != null) {
+			currAbortController.abort();
+		}
+		abortController.current = new AbortController();
+		const abortSignal = abortController.current.signal;
 
-		setPokemons([...pokemons, ...newPokemons]);
+		const newPokemons = await service.pokemons(offset, searchFilter, abortSignal);
+		if (abortSignal.aborted) {
+			return;
+		}
+		abortController.current = null;
+
+		setPokemons(current => [...current, ...newPokemons]);
 		setHasMore(newPokemons.length > 0);
 	};
 
 	useEffect(() => {
-		fetchPokemons(index);
-	}, [index]);
-
-	useEffect(() => {
-		filterPokemons(searchFilter);
-	}, [searchFilter, pokemons]);
+		filterPokemons();
+	}, [searchFilter]);
 
 	function nextPage() {
-		const newIndex = index + 50;
-		setIndex(newIndex);
+		indexRef.current += 50;
+		fetchPokemons(indexRef.current);
 	}
 
-	function filterPokemons(filter: string) {
-		if (filter === "") {
-			return pokemons;
-		} else {
-			const searchValue = filter.toLowerCase();
-			const filtered = pokemons.filter(pokemon => pokemon.name.toLowerCase().includes(searchValue));
-			return filtered;
-		}
+	function filterPokemons(): void {
+		setPokemons([]);
+		indexRef.current = 0;
+
+		fetchPokemons(0);
 	}
 
 	function toggleFavorite(pokemon: Pokemon) { 
-		if ((pokemon as any).favorite) {
+		if (pokemon.favorite) {
 			service.unsetFavorite(pokemon);
 		}
 		else {
@@ -69,8 +74,6 @@ export function Pokedex()
 		});
 	}
 
-	const filteredPokemons = filterPokemons(searchFilter);
-
 	return (
 		<div className="container-fluid py-4 bg-dark">
 			<h1 className="text-center mb-4">Pokédex</h1>
@@ -89,7 +92,7 @@ export function Pokedex()
 			</div>
 
 			<InfiniteScroll
-				dataLength={filteredPokemons.length}
+				dataLength={pokemons.length}
 				next={nextPage}
 				hasMore={hasMore}
 				loader={
@@ -99,7 +102,7 @@ export function Pokedex()
 					</div>
 				}>
 				<div className="row justify-content-center">
-					{ pokemonList(filteredPokemons) }
+					{ pokemonList(pokemons) }
 				</div>
 			</InfiniteScroll>
 		</div>

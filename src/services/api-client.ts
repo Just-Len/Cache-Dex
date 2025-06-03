@@ -4,11 +4,13 @@ const API_URL = "https://beta.pokeapi.co/graphql/v1beta";
 
 export class ApiClient
 {
-	async pokemonCount(): Promise<number>
+	async pokemonCount(searchFilter: string = ""): Promise<number>
 	{
 		const query = `#graphql
 			query pokemonCount {
-				count: pokemon_v2_pokemon_aggregate {
+				count: pokemon_v2_pokemon_aggregate(
+					where: { name: { _ilike: "%${searchFilter}%" } }
+				) {
 					aggregate {
 						count
 					}
@@ -16,20 +18,26 @@ export class ApiClient
 			}
 		`;
 
-		const response = await fetch(API_URL, {
-			method: "POST",
-			body: JSON.stringify({ operationName: "pokemonCount", query: `${query}` })
-		});
-		const payload = await response.json();
-		return payload.data.count.aggregate.count;
+		try {
+			const response = await fetch(API_URL, {
+				method: "POST",
+				body: JSON.stringify({ operationName: "pokemonCount", query: `${query}` })
+			});
+			const payload = await response.json();
+			return payload.data.count.aggregate.count;
+		}
+		catch (_) {
+			return 0;
+		}
 	}
-	async pokemon(count = 64, offset = 0): Promise<Pokemon[]>
+	async pokemon(abortSignal: AbortSignal, count = 64, offset = 0, searchFilter: string = ""): Promise<Pokemon[]>
 	{
 		const query = `#graphql
 			query pokemons {
 				pokemons: pokemon_v2_pokemon(
 					limit: ${count},
-					offset: ${offset}
+					offset: ${offset},
+					where: { name: { _ilike: "%${searchFilter}%" } }
 				) {
 					stats: pokemon_v2_pokemonstats {
 						stat: pokemon_v2_stat {
@@ -77,41 +85,49 @@ export class ApiClient
 			}
 		`;
 
-		const response = await fetch(API_URL, {
-			method: "POST",
-			body: JSON.stringify({ operationName: "pokemons", query: `${query}` })
-		});
-		const payload = await response.json();
-		const pokemons: any[] = payload.data.pokemons;
+		try {
+			//await new Promise((resolve, _) => setTimeout(resolve, 5000));
+			const response = await fetch(API_URL, {
+				method: "POST",
+				body: JSON.stringify({ operationName: "pokemons", query: `${query}` }),
+				signal: abortSignal
+			});
+			const payload = await response.json();
+			const pokemons: any[] = payload.data.pokemons;
 
-		for (const pokemon of pokemons) {
-			pokemon.favorite = false;
-			const speciesNames = new Map<number, string>();
-			for (let species_name of pokemon.species.names) {
-				speciesNames.set(species_name.language_id, species_name.name);
-			}
-			pokemon.species.names = speciesNames;
-
-			for (const stat of pokemon.stats) {
-				const names = new Map<number, string>();
-				for (const stat_name of stat.stat.names) {
-					names.set(stat_name.language_id, stat_name.name);
+			for (const pokemon of pokemons) {
+				pokemon.favorite = false;
+				const speciesNames = new Map<number, string>();
+				for (let species_name of pokemon.species.names) {
+					speciesNames.set(species_name.language_id, species_name.name);
 				}
-				stat.names = names;
-				stat.stat = undefined;
-			}
-			for (let type of pokemon.types) {
-				const names = new Map<number, string>();
-				for (const type_name of type.type.names) {
-					names.set(type_name.language_id, type_name.name);
-				}
-				type.names = names;
-				type.type = undefined;
-			}
+				pokemon.species.names = speciesNames;
 
-			pokemon.sprites = pokemon.sprites[0].sprites;
+				for (const stat of pokemon.stats) {
+					const names = new Map<number, string>();
+					for (const stat_name of stat.stat.names) {
+						names.set(stat_name.language_id, stat_name.name);
+					}
+					stat.names = names;
+					stat.stat = undefined;
+				}
+				for (let type of pokemon.types) {
+					const names = new Map<number, string>();
+					for (const type_name of type.type.names) {
+						names.set(type_name.language_id, type_name.name);
+					}
+					type.names = names;
+					type.type = undefined;
+				}
+
+				pokemon.sprites = pokemon.sprites[0].sprites;
+			}
+			return pokemons;
 		}
-		return pokemons;
+		catch (err) {
+			console.error(err);
+			return [];
+		}
 	}
 }
 

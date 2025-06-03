@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { PokemonService } from "../services/pokemon-service";
 import InfiniteScroll from "react-infinite-scroll-component";
 import { Pokecard } from "./PokeCard/PokeCard";
@@ -11,16 +11,23 @@ export function Favorites()
     const [moar, setMoar] = useState(true);
     const [listOffset, setListOffset] = useState(0);
 	const [pokemons, setPokemons] = useState<Pokemon[]>([]);
+	const abortController = useRef<AbortController | null>(null);
 
 	useEffect(() => {
 		loadPokemons(listOffset);
 	}, [listOffset]);
 
 	async function loadPokemons(offset: number) {
-		const newPokemons = await service.favoritePokemons(offset);
-		const allPokemons = [...pokemons, ...newPokemons];
-		setPokemons(allPokemons);
-		setMoar(allPokemons.length != service.favoriteCount);
+		if (abortController.current != null) {
+			abortController.current.abort();
+		}
+		abortController.current = new AbortController();
+
+		const newPokemons = await service.favoritePokemons(offset, abortController.current.signal);
+		abortController.current = null;
+
+		setPokemons(current => [...current, ...newPokemons]);
+		setMoar(newPokemons.length > 0);
 	}
 
 	async function moarPokemons() {

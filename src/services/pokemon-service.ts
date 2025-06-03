@@ -10,6 +10,7 @@ export class PokemonService
 	private _favoriteIds: number[];
 	private _favoritePokemons: Pokemon[];
 	private _pokemons: Pokemon[];
+	private _currentSearchFilter: string;
 
 	constructor()
 	{
@@ -22,6 +23,7 @@ export class PokemonService
 		this._favoriteIds = JSON.parse(favoritesString);
 		this._favoritePokemons = [];
 		this._pokemons = [];
+		this._currentSearchFilter = "";
 	}
 
 	get favoriteCount()
@@ -29,12 +31,12 @@ export class PokemonService
 		return this._favoriteIds.length;
 	}
 
-	async favoritePokemons(offset: number)
+	async favoritePokemons(offset: number, abortSignal: AbortSignal)
 	{
 		let pokemons: Pokemon[] = [];
 
 		if (offset <= this._favoriteIds.length && this._favoritePokemons.length <= offset) {
-			pokemons = await this.pokemons(offset);
+			pokemons = await this.pokemons(offset, this._currentSearchFilter, abortSignal);
 			pokemons = pokemons.filter(pokemon => this._favoriteIds.includes(pokemon.id));
 			this._favoritePokemons.push(...pokemons);
 		}
@@ -45,13 +47,18 @@ export class PokemonService
 		return pokemons;
 	}
 
-    async pokemons(offset: number)
+    async pokemons(offset: number, searchFilter: string, abortSignal: AbortSignal)
 	{
-		const pokemonCount  = await this._apiClient.pokemonCount();
+		const pokemonCount  = await this._apiClient.pokemonCount(searchFilter);
 		let pokemons: Pokemon[];
 
+		if (this._currentSearchFilter != searchFilter) {
+			this._pokemons = [];
+		}
+		this._currentSearchFilter = searchFilter;
+
 		if (offset <= pokemonCount && this._pokemons.length <= offset) {
-			pokemons = await this._apiClient.pokemon(CHUNK_SIZE, offset);
+			pokemons = await this._apiClient.pokemon(abortSignal, CHUNK_SIZE, offset, searchFilter);
 			pokemons.forEach((pokemon: Pokemon) => pokemon.favorite = this._favoriteIds.includes(pokemon.id));
 
 			this._pokemons.push(...pokemons);

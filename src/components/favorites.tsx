@@ -54,22 +54,26 @@ export function Favorites()
 	}
 
     return (
-        <div className='container-fluid'>
-            <h1 className='text-center'>{ STRINGS.favorites }</h1>
-			<InfiniteScroll
-			  dataLength={pokemons.length}
-			  next={moarPokemons}
-			  hasMore={moar}
-			  loader={
-				  <div style={{ textAlign: "center" }}>
-					  <img style={{ height: "5em" }} src="image/pikachu-running.gif"/>
-					  <h4 className='text-center'>{ STRINGS.loading }</h4>
-				  </div>
-			  }>
-				<div className="row justify-content-center">
-					{ pokemonList() }
-				</div>
-			</InfiniteScroll>
+        <div className="container-fluid d-flex flex-column h-100">
+            <h1 className="text-center">{ STRINGS.favorites }</h1>
+
+			<div id="scrollable" style={{ flex: 1, overflowY: "auto" }}>
+				<InfiniteScroll
+				  dataLength={pokemons.length}
+				  next={moarPokemons}
+				  hasMore={moar}
+				  loader={
+					  <div style={{ textAlign: "center" }}>
+						  <img style={{ height: "5em" }} src="image/pikachu-running.gif"/>
+						  <h4 className="text-center">{ STRINGS.loading }</h4>
+					  </div>
+				  }
+				  scrollableTarget="scrollable">
+					<div className="row justify-content-center">
+						{ pokemonList() }
+					</div>
+				</InfiniteScroll>
+			</div>
         </div>
     );
 }

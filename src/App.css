@@ -1,5 +1,4 @@
 #root {
-	display: flex;
 	height: 100%;
 }
 
@@ -19,11 +18,13 @@
 .tabs-container {
 	display: flex;
 	flex-flow: column;
+	height: 100%;
 	width: 100%;
 }
 .react-tabs__tab-panel {
 	display: none;
 	flex: 1;
+	min-height: 0%;
 }
 .react-tabs__tab-panel--selected {
 	display: block;

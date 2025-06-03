@@ -1,6 +1,8 @@
-import './PokeCard.css'
 import { useState } from "react";
 import { languageIdFor, Pokemon } from "../../typedef";
+import { STRINGS } from '../../strings';
+
+import './PokeCard.css'
 
 interface PokecardProps
 {
@@ -8,11 +10,9 @@ interface PokecardProps
 	favoriteAction: (pokemon: Pokemon) => void;
 }
 
-
 export function Pokecard({ pokemon, favoriteAction }: PokecardProps)
 {
-	// I don't care about typing here anymore
-	const [favorite, setFavorite] = useState((pokemon as any).favorite || false);
+	const [favorite, setFavorite] = useState(pokemon.favorite);
 	const languageId = languageIdFor(navigator.languages[0]);
 
 	let favoriteButtonText;
@@ -21,10 +21,10 @@ export function Pokecard({ pokemon, favoriteAction }: PokecardProps)
 	let spriteUrl: string | undefined;
 
 	if (favorite) {
-		favoriteButtonText = "Remover de favoritos";
+		favoriteButtonText = STRINGS.removeFavorite;
 	}
 	else {
-		favoriteButtonText = "Agregar a favoritos";
+		favoriteButtonText = STRINGS.addFavorite;
 	}
 
 	if (pokemon.species) {
@@ -68,8 +68,8 @@ export function Pokecard({ pokemon, favoriteAction }: PokecardProps)
 				style={{ width: "80%", height: "auto" }}
 			  />
 	  
-			  <p className="mb-1"><strong>Tipo:</strong> {typeName}</p>
-			  <p className="mb-3"><strong>ID:</strong> {pokemon?.id}</p>
+			  <p className="mb-1"><strong>{STRINGS.type}:</strong> {typeName}</p>
+			  <p className="mb-3"><strong>{STRINGS.id}:</strong> {pokemon?.id}</p>
 	  
 			  <button
 				className="btn btn-warning mt-auto px-4 rounded-pill"

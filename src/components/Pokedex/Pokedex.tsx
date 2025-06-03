@@ -4,6 +4,7 @@ import './Pokedex.css'
 import InfiniteScroll from 'react-infinite-scroll-component';
 import { PokemonService } from '../../services/pokemon-service';
 import { Pokemon } from '../../typedef';
+import { STRINGS } from '../../strings';
 
 export function Pokedex()
 {
@@ -76,17 +77,16 @@ export function Pokedex()
 
 	return (
 		<div className="container-fluid py-4 bg-dark">
-			<h1 className="text-center mb-4">Pokédex</h1>
+			<h1 className="text-center mb-4">{ STRINGS.pokedex }</h1>
 
 			<div className="d-flex justify-content-center mb-4">
 				<div className="w-100" style={{ maxWidth: "400px" }}>
-					<label htmlFor="search-input" className="form-label">Buscar Pokémon</label>
 					<input
 						id="search-input"
 						type="text"
 						onChange={handleSearch}
 						className="form-control"
-						placeholder="Ej. Pikachu"
+						placeholder={STRINGS.search}
 					/>
 				</div>
 			</div>
@@ -98,7 +98,7 @@ export function Pokedex()
 				loader={
 					<div style={{ textAlign: "center" }}>
 						<img style={{ height: "5em" }} src="image/pikachu-running.gif" />
-						<h4 className='text-center'>Cargando...</h4>
+						<h4 className='text-center'>{STRINGS.loading}</h4>
 					</div>
 				}>
 				<div className="row justify-content-center">

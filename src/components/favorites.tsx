@@ -3,6 +3,7 @@ import { PokemonService } from "../services/pokemon-service";
 import InfiniteScroll from "react-infinite-scroll-component";
 import { Pokecard } from "./PokeCard/PokeCard";
 import { Pokemon } from "../typedef";
+import { STRINGS } from "../strings";
 
 export function Favorites()
 {
@@ -54,7 +55,7 @@ export function Favorites()
 
     return (
         <div className='container-fluid'>
-            <h1 className='text-center'>Pokémon favoritos</h1>
+            <h1 className='text-center'>{ STRINGS.favorites }</h1>
 			<InfiniteScroll
 			  dataLength={pokemons.length}
 			  next={moarPokemons}
@@ -62,7 +63,7 @@ export function Favorites()
 			  loader={
 				  <div style={{ textAlign: "center" }}>
 					  <img style={{ height: "5em" }} src="image/pikachu-running.gif"/>
-					  <h4 className='text-center'>Cargando</h4>
+					  <h4 className='text-center'>{ STRINGS.loading }</h4>
 				  </div>
 			  }>
 				<div className="row justify-content-center">

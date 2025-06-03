@@ -4,6 +4,7 @@ import { PokemonService } from '../../services/pokemon-service';
 import { languageIdFor, Pokemon } from '../../typedef';
 
 import './PokemonStats.css';
+import { STRINGS } from '../../strings';
 
 export function PokemonStats()
 {
@@ -54,17 +55,16 @@ export function PokemonStats()
 
 	return (
 		<div className="container-fluid py-4">
-			<h1 className="text-center mb-4">Estadísticas</h1>
+			<h1 className="text-center mb-4">{STRINGS.cachedex}</h1>
 
 			<div className="d-flex justify-content-center mb-4">
 				<div className="w-100" style={{ maxWidth: "400px" }}>
-					<label htmlFor="search-input" className="form-label">Buscar Pokémon</label>
 					<input
 						id="search-input"
 						type="text"
 						onChange={handleSearch}
 						className="form-control"
-						placeholder="Ej. Bulbasaur"
+						placeholder={STRINGS.search}
 					/>
 				</div>
 			</div>
@@ -75,7 +75,7 @@ export function PokemonStats()
 				loader={
 					<div style={{ textAlign: "center" }}>
 						<img style={{ height: "5em" }} src="image/pikachu-running.gif" alt="Cargando" />
-						<h4 className="text-center">Cargando...</h4>
+						<h4 className="text-center">{STRINGS.loading}</h4>
 					</div>
 				}>
 					<div className="row justify-content-center">
@@ -99,7 +99,7 @@ export function PokemonStats()
 							<button className="close-button" onClick={() => setSelectedPokemon(null)}>✖</button>
 							<h2 className="text-center">{selectedPokemon.species.names.get(languageId)}</h2>
 							<img src={selectedPokemon.sprites.front_default ?? ""} alt={selectedPokemon.species.names.get(languageId)} className="modal-pokemon-image" />
-							<h4>Estadísticas:</h4>
+							<h4>{STRINGS.stats}</h4>
 							<ul className="stats-list">
 								{
 									selectedPokemon.stats.map(stat => (

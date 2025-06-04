@@ -1,0 +1,22 @@
+
+.pokecard {
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+body.dark .pokecard {
+  background-color: #1e1e1e;
+  color: #ffffff;
+}
+
+body.light .pokecard {
+  background-color: #ffffff;
+  color: #000000;
+}
+
+body.dark .pokecard {
+  border: 1px solid #333;
+}
+
+body.light .pokecard {
+  border: 1px solid #ddd;
+}

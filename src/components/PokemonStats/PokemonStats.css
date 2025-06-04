@@ -58,3 +58,24 @@
 	list-style: none;
 	padding: 0;
 }
+
+.pokemon-card,
+.pokemon-modal-content {
+	background-color: #ffffff;
+	color: #000000;
+	border: 1px solid #ddd;
+}
+
+body.dark .pokemon-card,
+body.dark .pokemon-modal-content {
+	background-color: #2d2d2d;
+	color: #ffffff;
+	border: 1px solid #444;
+}
+
+body.dark .close-button {
+	color: white;
+}
+body.light .close-button {
+	color: black;
+}

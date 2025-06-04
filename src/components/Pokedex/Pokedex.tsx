@@ -76,10 +76,10 @@ export function Pokedex()
 	}
 
 	return (
-		<div className="bg-dark container-fluid d-flex flex-column h-100 py-4">
-			<h1 className="text-center mb-4">{ STRINGS.pokedex }</h1>
+		<div className="pokedex container-fluid d-flex flex-column h-100 py-4">
 
 			<div className="d-flex justify-content-center mb-4">
+			<h1 className="text-center mb-4">{ STRINGS.pokedex + ": "}</h1>
 				<div className="w-100" style={{ maxWidth: "400px" }}>
 					<input
 						id="search-input"

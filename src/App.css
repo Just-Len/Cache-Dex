@@ -1,6 +1,11 @@
 #root {
 	height: 100%;
 }
+*{
+	margin: 0;
+	padding: 0;
+	box-sizing: border-box;
+}
 
 .logo {
 	height: 6em;
@@ -59,4 +64,113 @@
 
 .read-the-docs {
 	color: #888;
+}
+
+body.light {
+  background-color: white;
+  color: black;
+height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+}
+
+body.dark {
+	height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  background-color: #121212;
+  color: #ffffff;
+}
+
+body.dark .tabs-container {
+  background-color: #1e1e1e !important;
+  color: white !important;
+}
+
+body.light .tabs-container {
+  background-color: white !important;
+  color: black !important;
+}
+
+button {
+  margin: 1rem;
+  padding: 0.5rem 1rem;
+  font-size: 16px;
+  cursor: pointer;
+}
+.switch-container {
+
+  display: inline-block;
+  position: relative;
+}
+
+.switch-container input {
+  display: none;
+}
+
+label {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 75px;
+  height: 35px;
+  background: #525252;
+  border-radius: 50px;
+  cursor: pointer;
+  position: relative;
+  box-sizing: border-box;
+}
+
+label i {
+  font-size: 18px;
+  color: white;
+  position: absolute;
+  transition: opacity 0.4s ease;
+}
+
+
+label .fa-sun {
+  left: 12px;
+  color: gold;
+  opacity: 1;
+}
+
+label .fa-moon {
+  right: 12px;
+  opacity: 1;
+}
+
+input:checked + label .fa-sun {
+  opacity: 1;  
+}
+
+input:checked + label .fa-moon {
+  opacity: 0;  
+}
+input:not(:checked) + label .fa-sun {
+  opacity: 0;  
+}
+
+input:not(:checked) + label .fa-moon {
+  opacity: 1; 
+}
+
+
+label .ball {
+  position: absolute;
+  width: 25px;
+  height: 25px;
+  top: 5px;
+  left: 5px;
+  background: #fff;
+  border-radius: 50%;
+  transition: transform 0.4s ease;
+}
+
+input:checked + label .ball {
+  transform: translateX(40px);
 }

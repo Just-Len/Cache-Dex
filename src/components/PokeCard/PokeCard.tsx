@@ -57,8 +57,8 @@ export function Pokecard({ pokemon, favoriteAction }: PokecardProps)
 
 	return (
 		<div className="col-sm-6 col-md-4 col-lg-3 mb-4">
-		  <div className="card h-100 shadow bg-dark text-white rounded-4">
-			<div className="card-body d-flex flex-column align-items-center">
+  			<div className="pokecard card h-100 shadow rounded-4">
+    		<div className="card-body d-flex flex-column align-items-center">	
 			  <h5 className="card-title text-capitalize">{name}</h5>
 	  
 			  <img

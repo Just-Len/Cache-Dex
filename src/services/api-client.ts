@@ -9,8 +9,17 @@ export class ApiClient
 		const query = `#graphql
 			query pokemonCount {
 				count: pokemon_v2_pokemon_aggregate(
-					where: { name: { _ilike: "%${searchFilter}%" } }
-				) {
+					where: {
+						name: { _ilike: "%${searchFilter}%" },
+						pokemon_v2_pokemonspecy: {
+							pokemon_v2_pokemonspeciesnames: {
+								pokemon_v2_language: { name: {_in: ["es", "en", "ja-Hrkt"] } },
+								name: { _ilike: "%${searchFilter}%" }
+							}
+						}
+					}
+				)
+				{
 					aggregate {
 						count
 					}
@@ -37,8 +46,18 @@ export class ApiClient
 				pokemons: pokemon_v2_pokemon(
 					limit: ${count},
 					offset: ${offset},
-					where: { name: { _ilike: "%${searchFilter}%" } }
-				) {
+					order_by: { id: asc },
+					where: {
+						name: { _ilike: "%${searchFilter}%" },
+						pokemon_v2_pokemonspecy: {
+							pokemon_v2_pokemonspeciesnames: {
+								pokemon_v2_language: { name: {_in: ["es", "en", "ja-Hrkt"] } },
+								name: { _ilike: "%${searchFilter}%" }
+							}
+						}
+					}
+				)
+				{
 					stats: pokemon_v2_pokemonstats {
 						stat: pokemon_v2_stat {
 							names: pokemon_v2_statnames(

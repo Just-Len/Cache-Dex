@@ -62,7 +62,7 @@ export function Favorites()
 			return (
 				<div className="align-items-center d-flex flex-column h-100 justify-content-center w-100">
 					<img style={{ height: "7em" }} src="image/pikachu-winking.gif" />
-					<p className="text-center">We didn't found any pokemons</p>
+					<p className="text-center">{ STRINGS.noPokemons }</p>
 				</div>
 			);
 		}

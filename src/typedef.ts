@@ -35,14 +35,11 @@ export interface Pokemon
 
 export function languageIdFor(languageName: string): number
 {
-	switch (languageName) {
-		case "ja":
-		case "jpn":
-		case "ja-Hkrt":
-			return 1;
-		case "es":
-		case "spa":
-			return 7;
+	if (languageName.startsWith("ja")) {
+		return 1;
+	}
+	if (languageName.startsWith("es")) {
+		return 7;
 	}
 
 	return 9;

@@ -5,6 +5,7 @@ import { languageIdFor, Pokemon } from '../../typedef';
 
 import './PokemonStats.css';
 import { STRINGS } from '../../strings';
+import useScrollable from '../../useScrollable';
 
 export function PokemonStats()
 {
@@ -15,10 +16,15 @@ export function PokemonStats()
 	const [searchFilter, setSearchFilter] = useState("");
 	const [selectedPokemon, setSelectedPokemon] = useState<Pokemon | null>(null);
 	const [hasMore, setHasMore] = useState(true);
+	const [loading, setLoading] = useState<boolean>(false);
+	const [scrollable, scrollableRef, node] = useScrollable([pokemons]);
+
 	const abortControllerRef = useRef<AbortController | null>(null);
 	const offsetRef = useRef<number>(0);
 
 	async function getPokemonsFromCache() {
+		setLoading(true);
+
 		const currAbortController = abortControllerRef.current;
 		if (currAbortController != null) {
 			currAbortController.abort();
@@ -35,6 +41,7 @@ export function PokemonStats()
 
 		setPokemons(current => [...current, ...newPokemons]);
 		setHasMore(newPokemons.length > 0);
+		setLoading(false);
 	}
 
 	useEffect(() => {
@@ -43,6 +50,17 @@ export function PokemonStats()
 		
 		getPokemonsFromCache();
 	}, [searchFilter]);
+
+	useEffect(() => {
+		if (!node || loading) {
+			return;
+		}
+
+		if (!scrollable && hasMore) {
+		  nextPage();
+		}
+	}, [hasMore, loading, node, scrollable]);
+
 
 	function handleSearch(event: React.ChangeEvent<HTMLInputElement>) {
 		setSearchFilter(event.target.value);
@@ -53,23 +71,18 @@ export function PokemonStats()
         getPokemonsFromCache();
 	}
 
-	return (
-		<div className="container-fluid d-flex flex-column h-100 py-4">
-			<h1 className="text-center mb-4">{STRINGS.cachedex}</h1>
-
-			<div className="d-flex justify-content-center mb-4">
-				<div className="w-100" style={{ maxWidth: "400px" }}>
-					<input
-						id="search-input"
-						type="text"
-						onChange={handleSearch}
-						className="form-control"
-						placeholder={STRINGS.search}
-					/>
+	function pokemonList() {
+		if (!loading && pokemons.length == 0) {
+			return (
+				<div className="align-items-center d-flex flex-column h-100 justify-content-center w-100">
+					<img style={{ height: "7em" }} src="image/pikachu-winking.gif" />
+					<p className="text-center">We didn't found any pokemons</p>
 				</div>
-			</div>
-
-			<div id="scrollable" style={{ flex: 1, overflowY: "auto" }}>
+			);
+		}
+		
+		return (
+			<div id="scrollable" ref={ scrollableRef } style={{ flex: 1, overflowY: "auto" }}>
 				<InfiniteScroll
 					dataLength={pokemons.length}
 					next={nextPage}
@@ -94,7 +107,25 @@ export function PokemonStats()
 						</div>
 					</InfiniteScroll>
 				</div>
+		);
+	}
 
+	return (
+		<div className="container-fluid d-flex flex-column h-100 py-4">
+			<h1 className="text-center mb-4">{STRINGS.cachedex}</h1>
+
+			<div className="d-flex justify-content-center mb-4">
+				<div className="w-100" style={{ maxWidth: "400px" }}>
+					<input
+						id="search-input"
+						type="text"
+						onChange={handleSearch}
+						className="form-control"
+						placeholder={STRINGS.search}
+					/>
+				</div>
+			</div>
+			{ pokemonList() }
 
 			{
 				selectedPokemon && (

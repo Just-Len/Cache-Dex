@@ -8,6 +8,27 @@
 	box-sizing: border-box;
 }
 
+body.dark {
+	#search-input {
+		background-color: #1e1e1e;
+		color: rgb(255, 255, 255);
+		border-color: #868686;
+
+	}
+
+	#search-input::placeholder {
+		color: lightgray;
+	}
+}
+
+body.light {
+	#search-input {
+		background-color: white;
+		color: black;
+		border-color: #ccc;
+	}
+}
+
 .logo {
 	height: 6em;
 	padding: 1.5em;

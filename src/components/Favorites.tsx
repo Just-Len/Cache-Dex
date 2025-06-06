@@ -4,6 +4,7 @@ import InfiniteScroll from "react-infinite-scroll-component";
 import { Pokecard } from "./PokeCard/PokeCard";
 import { Pokemon } from "../typedef";
 import { STRINGS } from "../strings";
+import useScrollable from "../useScrollable";
 
 export function Favorites()
 {
@@ -12,23 +13,43 @@ export function Favorites()
     const [moar, setMoar] = useState(true);
     const [listOffset, setListOffset] = useState(0);
 	const [pokemons, setPokemons] = useState<Pokemon[]>([]);
+	const [loading, setLoading] = useState<boolean>(false);
+	const [scrollable, scrollableRef, node] = useScrollable([pokemons]);
+
 	const abortController = useRef<AbortController | null>(null);
 
 	useEffect(() => {
 		loadPokemons(listOffset);
 	}, [listOffset]);
 
+	useEffect(() => {
+		if (!node || loading) {
+			return;
+		}
+
+		if (!scrollable && moar) {
+		  moarPokemons();
+		}
+	}, [moar, loading, node, scrollable]);
+
 	async function loadPokemons(offset: number) {
+		setLoading(true);
+
 		if (abortController.current != null) {
 			abortController.current.abort();
 		}
 		abortController.current = new AbortController();
 
-		const newPokemons = await service.favoritePokemons(offset, abortController.current.signal);
+		const abortSignal = abortController.current.signal;
+		const newPokemons = await service.favoritePokemons(offset, abortSignal);
+		if (abortSignal.aborted) {
+			return;
+		}
 		abortController.current = null;
 
 		setPokemons(current => [...current, ...newPokemons]);
 		setMoar(newPokemons.length > 0);
+		setLoading(false);
 	}
 
 	async function moarPokemons() {
@@ -37,27 +58,17 @@ export function Favorites()
 	}
 
 	function pokemonList() {
-		if (pokemons.length == 0) {
-			return undefined;
+		if (!loading && pokemons.length == 0) {
+			return (
+				<div className="align-items-center d-flex flex-column h-100 justify-content-center w-100">
+					<img style={{ height: "7em" }} src="image/pikachu-winking.gif" />
+					<p className="text-center">We didn't found any pokemons</p>
+				</div>
+			);
 		}
 
-		return pokemons.map(pokemon => {
-			return (
-				<Pokecard key={pokemon.id} pokemon={pokemon} favoriteAction={removeFavorite} />
-			)
-		});
-	}
-
-	function removeFavorite(pokemon: Pokemon) { 
-		service.unsetFavorite(pokemon);
-		setPokemons(pokemons.filter(p => p.id != pokemon.id));
-	}
-
-    return (
-        <div className="container-fluid d-flex flex-column h-100 py-4">
-            <h1 className="text-center">{ STRINGS.favorites }</h1>
-
-			<div id="scrollable" style={{ flex: 1, overflowY: "auto" }}>
+		return (
+			<div id="scrollable" ref={ scrollableRef } style={{ flex: 1, overflowY: "auto" }}>
 				<InfiniteScroll
 				  dataLength={pokemons.length}
 				  next={moarPokemons}
@@ -70,10 +81,28 @@ export function Favorites()
 				  }
 				  scrollableTarget="scrollable">
 					<div className="row justify-content-center">
-						{ pokemonList() }
+						{
+							pokemons.map(pokemon =>
+									<Pokecard key={pokemon.id} pokemon={pokemon} favoriteAction={removeFavorite} />
+							)
+						}
 					</div>
 				</InfiniteScroll>
 			</div>
+		);
+	}
+
+	function removeFavorite(pokemon: Pokemon) { 
+		service.unsetFavorite(pokemon);
+		setPokemons(pokemons.filter(p => p.id != pokemon.id));
+	}
+
+    return (
+        <div className="container-fluid d-flex flex-column h-100 py-4">
+            <h1 className="text-center">{ STRINGS.favorites }</h1>
+				{
+					pokemonList()
+				}
         </div>
     );
 }

@@ -1,10 +1,10 @@
-import React, { useEffect, useRef, useState } from 'react';
-import { Pokecard } from '../PokeCard/PokeCard';
-import './Pokedex.css'
-import InfiniteScroll from 'react-infinite-scroll-component';
-import { PokemonService } from '../../services/pokemon-service';
-import { Pokemon } from '../../typedef';
-import { STRINGS } from '../../strings';
+import React, { useEffect, useRef, useState } from "react";
+import { Pokecard } from "../PokeCard/PokeCard";
+import InfiniteScroll from "react-infinite-scroll-component";
+import { PokemonService } from "../../services/pokemon-service";
+import { Pokemon } from "../../typedef";
+import { STRINGS } from "../../strings";
+import useScrollable from "../../useScrollable";
 
 export function Pokedex()
 {
@@ -13,10 +13,15 @@ export function Pokedex()
 	const [hasMore, setHasMore] = useState(true);
 	const [searchFilter, setSearchFilter] = useState("");
 	const [pokemons, setPokemons] = useState<Pokemon[]>([]);
+	const [loading, setLoading] = useState<boolean>(false);
+	const [scrollable, scrollableRef, node] = useScrollable([pokemons]);
+
 	const abortController = useRef<AbortController | null>(null);
 	const indexRef = useRef<number>(0);
 
-	const fetchPokemons = async (offset: number) => {
+	async function fetchPokemons(offset: number) {
+		setLoading(true);
+
 		const currAbortController = abortController.current;
 		if (currAbortController != null) {
 			currAbortController.abort();
@@ -32,11 +37,22 @@ export function Pokedex()
 
 		setPokemons(current => [...current, ...newPokemons]);
 		setHasMore(newPokemons.length > 0);
+		setLoading(false);
 	};
 
 	useEffect(() => {
 		filterPokemons();
 	}, [searchFilter]);
+
+	useEffect(() => {
+		if (!node || loading) {
+			return;
+		}
+
+		if (!scrollable && hasMore) {
+		  nextPage();
+		}
+	}, [hasMore, loading, node, scrollable]);
 
 	function nextPage() {
 		indexRef.current += 50;
@@ -50,7 +66,7 @@ export function Pokedex()
 		fetchPokemons(0);
 	}
 
-	function toggleFavorite(pokemon: Pokemon) { 
+	function toggleFavorite(pokemon: Pokemon) {
 		if (pokemon.favorite) {
 			service.unsetFavorite(pokemon);
 		}
@@ -64,22 +80,46 @@ export function Pokedex()
 	}
 
 	function pokemonList(pokemons: Pokemon[]) {
-		if (pokemons.length == 0) {
-			return undefined;
+		if (!loading && pokemons.length == 0) {
+			return (
+				<div className="align-items-center d-flex flex-column h-100 justify-content-center w-100">
+					<img style={{ height: "7em" }} src="image/pikachu-winking.gif" />
+					<p className="text-center">{ STRINGS.noPokemons }</p>
+				</div>
+			);
 		}
 
-		return pokemons.map(pokemon => {
-			return (
-				<Pokecard key={pokemon.id} pokemon={pokemon} favoriteAction={toggleFavorite} />
-			)
-		});
+		return (
+			<div id="scrollable" ref={ scrollableRef } style={{ flex: 1, overflowY: "auto" }}>
+				<InfiniteScroll
+					className="justify-self-center"
+					dataLength={pokemons.length}
+					next={nextPage}
+					hasMore={hasMore}
+					loader={
+						<div style={{ textAlign: "center" }}>
+							<img style={{ height: "5em" }} src="image/pikachu-running.gif" />
+							<p className="text-center">{STRINGS.loading}</p>
+						</div>
+					}
+					scrollableTarget="scrollable">
+					<div className="row justify-content-center">
+						{
+							pokemons.map(pokemon =>
+								<Pokecard key={pokemon.id} pokemon={pokemon} favoriteAction={toggleFavorite} />
+							)
+						}
+					</div>
+				</InfiniteScroll>
+			</div>
+		);
 	}
 
 	return (
 		<div className="pokedex container-fluid d-flex flex-column h-100 py-4">
 
 			<div className="align-items-center d-flex flex-column justify-content-center mb-4">
-			<h1 className="text-center mb-4">{ STRINGS.pokedex }</h1>
+				<h1 className="text-center mb-4">{STRINGS.pokedex}</h1>
 				<div className="w-100" style={{ maxWidth: "400px" }}>
 					<input
 						id="search-input"
@@ -90,24 +130,7 @@ export function Pokedex()
 					/>
 				</div>
 			</div>
-
-			<div id="scrollable" style={{ flex: 1, overflowY: "auto" }}>
-				<InfiniteScroll
-					dataLength={pokemons.length}
-					next={nextPage}
-					hasMore={hasMore}
-					loader={
-						<div style={{ textAlign: "center" }}>
-							<img style={{ height: "5em" }} src="image/pikachu-running.gif" />
-							<h4 className='text-center'>{STRINGS.loading}</h4>
-						</div>
-					}
-					scrollableTarget="scrollable">
-					<div className="row justify-content-center">
-						{ pokemonList(pokemons) }
-					</div>
-				</InfiniteScroll>
-			</div>
+			{pokemonList(pokemons)}
 		</div>
 	);
 }

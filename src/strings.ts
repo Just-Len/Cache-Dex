@@ -7,6 +7,7 @@ export interface Strings extends LocalizedStrings
 	favorites: string;
 	id: string;
 	loading: string;
+	noPokemons: string;
 	search: string;
 	pokedex: string;
 	removeFavorite: string;
@@ -21,6 +22,7 @@ export const STRINGS: Strings = new LocalizedStrings({
 		favorites: "Favorites",
 		id: "ID",
 		loading: "Loading",
+		noPokemons: "We didn't found any pokemons",
 		search: "Search",
 		pokedex: "Pokedex",
 		removeFavorite: "Remove from favorites",
@@ -33,6 +35,7 @@ export const STRINGS: Strings = new LocalizedStrings({
 		favorites: "Favoritos",
 		id: "ID",
 		loading: "Cargando",
+		noPokemons: "No encontramos ningún pokémon",
 		search: "Buscar",
 		pokedex: "Pokédex",
 		removeFavorite: "Remover de favoritos",
@@ -45,6 +48,7 @@ export const STRINGS: Strings = new LocalizedStrings({
 		favorites: "お気に入り",
 		id: "ID",
 		loading: "読み込み中",
+		noPokemons: "ポケモンは見つかりませんでした",
 		search: "検索",
 		pokedex: "ポケモン図鑑",
 		removeFavorite: "お気に入りから削除",

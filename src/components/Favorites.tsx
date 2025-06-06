@@ -54,7 +54,7 @@ export function Favorites()
 	}
 
     return (
-        <div className="container-fluid d-flex flex-column h-100">
+        <div className="container-fluid d-flex flex-column h-100 py-4">
             <h1 className="text-center">{ STRINGS.favorites }</h1>
 
 			<div id="scrollable" style={{ flex: 1, overflowY: "auto" }}>

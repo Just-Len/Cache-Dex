@@ -1,3 +1,7 @@
+body.dark .icon-tab-selected {
+	background-color: #1e1e1e;
+	color: #fff;
+}
 .icon-tab {
 	border: 1px solid transparent;
 	border-bottom: none;

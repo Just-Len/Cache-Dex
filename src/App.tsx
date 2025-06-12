@@ -64,9 +64,8 @@ export default function App()
 						type="checkbox"
 						id="switch"
 						checked={darkMode}
-						onChange={() => setDarkMode((prev) => !prev)}
-					/>
-					<label htmlFor="switch">
+						onChange={() => setDarkMode((prev) => !prev)}/>
+					<label htmlFor="switch" role="switch">
 						<i className="fas fa-sun"></i>
 						<i className="fas fa-moon"></i>
 						<span className="ball"></span>

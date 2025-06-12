@@ -8,11 +8,15 @@ interface IconTabData extends TabProps
 	title: string;
 }
 
-export const IconTab: ReactTabsFunctionComponent<IconTabData> = ({iconUrl: imageUrl, title, ...other}) => (
-	<Tab className="icon-tab" selectedClassName="icon-tab-selected" {...other}>
-		<img className="icon-tab-image" src={imageUrl}/>
-		{title}
-	</Tab>
-);
+export const IconTab: ReactTabsFunctionComponent<IconTabData> = ({iconUrl: imageUrl, title, ...other}) =>
+{
+	const tabId = `tab-${title}`;
+	return (
+		<Tab className="icon-tab" selectedClassName="icon-tab-selected" {...other}>
+			<img aria-labelledby={tabId} className="icon-tab-image" src={imageUrl}/>
+			<div id={tabId}>{ title }</div>
+		</Tab>
+	);
+}
 
 IconTab.tabsRole = "Tab";

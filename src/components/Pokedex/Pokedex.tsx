@@ -83,7 +83,7 @@ export function Pokedex()
 		if (!loading && pokemons.length == 0) {
 			return (
 				<div className="align-items-center d-flex flex-column h-100 justify-content-center w-100">
-					<img style={{ height: "7em" }} src="image/pikachu-winking.gif" />
+					<img aria-label="Pikachu winking GIF" style={{ height: "7em" }} src="image/pikachu-winking.gif" />
 					<p className="text-center">{ STRINGS.noPokemons }</p>
 				</div>
 			);
@@ -98,12 +98,12 @@ export function Pokedex()
 					hasMore={hasMore}
 					loader={
 						<div style={{ textAlign: "center" }}>
-							<img style={{ height: "5em" }} src="image/pikachu-running.gif" />
+							<img aria-label="Pikachu running GIF" style={{ height: "5em" }} src="image/pikachu-running.gif" />
 							<p className="text-center">{STRINGS.loading}</p>
 						</div>
 					}
 					scrollableTarget="scrollable">
-					<div className="row justify-content-center">
+					<div className="px-3 row justify-content-center">
 						{
 							pokemons.map(pokemon =>
 								<Pokecard key={pokemon.id} pokemon={pokemon} favoriteAction={toggleFavorite} />
@@ -122,6 +122,7 @@ export function Pokedex()
 				<h1 className="text-center mb-4">{STRINGS.pokedex}</h1>
 				<div className="w-100" style={{ maxWidth: "400px" }}>
 					<input
+						aria-label="Search"
 						id="search-input"
 						type="text"
 						onChange={handleSearch}

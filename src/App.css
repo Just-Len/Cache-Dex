@@ -2,6 +2,7 @@
 	height: 100%;
 	width: 100%;
 }
+
 *{
 	margin: 0;
 	padding: 0;
@@ -130,8 +131,12 @@ button {
   position: relative;
 }
 
-.switch-container input {
-  display: none;
+#switch {
+  appearance: none;
+  border-radius: 1em;
+  height: 100%;
+  position: absolute;
+  width: 100%;
 }
 
 label {

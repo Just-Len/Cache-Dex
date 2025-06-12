@@ -74,7 +74,7 @@ export function Pokecard({ pokemon, favoriteAction }: PokecardProps)
 			  <button
 				className="btn btn-warning mt-auto px-4 rounded-pill"
 				onClick={(event) => toggleFavorite(event)}
-			  >
+				tabIndex={0}>
 				⭐ <p style={{ display: "inline"}}> {favoriteButtonText} </p>
 			  </button>
 			</div>

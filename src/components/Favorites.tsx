@@ -61,26 +61,26 @@ export function Favorites()
 		if (!loading && pokemons.length == 0) {
 			return (
 				<div className="align-items-center d-flex flex-column h-100 justify-content-center w-100">
-					<img style={{ height: "7em" }} src="image/pikachu-winking.gif" />
+					<img aria-label="Pikachu winking GIF" style={{ height: "7em" }} src="image/pikachu-winking.gif" />
 					<p className="text-center">{ STRINGS.noPokemons }</p>
 				</div>
 			);
 		}
 
 		return (
-			<div id="scrollable" ref={ scrollableRef } style={{ flex: 1, overflowY: "auto" }}>
+			<div id="scrollable" ref={ scrollableRef } style={{ flex: 1, overflowY: "auto" }} tabIndex={-1}>
 				<InfiniteScroll
 				  dataLength={pokemons.length}
 				  next={moarPokemons}
 				  hasMore={moar}
 				  loader={
 					  <div style={{ textAlign: "center" }}>
-						  <img style={{ height: "5em" }} src="image/pikachu-running.gif"/>
+						  <img aria-label="Pikachu running GIF" style={{ height: "5em" }} src="image/pikachu-running.gif"/>
 						  <h4 className="text-center">{ STRINGS.loading }</h4>
 					  </div>
 				  }
 				  scrollableTarget="scrollable">
-					<div className="row justify-content-center">
+					<div className="px-3 row justify-content-center">
 						{
 							pokemons.map(pokemon =>
 									<Pokecard key={pokemon.id} pokemon={pokemon} favoriteAction={removeFavorite} />

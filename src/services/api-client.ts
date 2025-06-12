@@ -39,7 +39,7 @@ export class ApiClient
 			return 0;
 		}
 	}
-	async pokemon(abortSignal: AbortSignal, count = 64, offset = 0, searchFilter: string = ""): Promise<Pokemon[]>
+	async pokemon(abortSignal: AbortSignal, count = 64, offset = 0, searchFilter: string = "", ids: number[] = []): Promise<Pokemon[]>
 	{
 		const query = `#graphql
 			query pokemons {
@@ -48,6 +48,7 @@ export class ApiClient
 					offset: ${offset},
 					order_by: { id: asc },
 					where: {
+						${ ids.length > 0 ? `id: { _in: ${JSON.stringify(ids)} },` : "" }
 						name: { _ilike: "%${searchFilter}%" },
 						pokemon_v2_pokemonspecy: {
 							pokemon_v2_pokemonspeciesnames: {

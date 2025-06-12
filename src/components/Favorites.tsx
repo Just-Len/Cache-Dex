@@ -80,7 +80,7 @@ export function Favorites()
 					  </div>
 				  }
 				  scrollableTarget="scrollable">
-					<div className="px-3 row justify-content-center">
+					<div id="main-content" className="px-3 row justify-content-center">
 						{
 							pokemons.map(pokemon =>
 									<Pokecard key={pokemon.id} pokemon={pokemon} favoriteAction={removeFavorite} />

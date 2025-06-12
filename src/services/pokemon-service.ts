@@ -33,18 +33,7 @@ export class PokemonService
 
 	async favoritePokemons(offset: number, abortSignal: AbortSignal)
 	{
-		let pokemons: Pokemon[] = [];
-
-		if (offset <= this._favoriteIds.length && this._favoritePokemons.length <= offset) {
-			pokemons = await this.pokemons(offset, this._currentSearchFilter, abortSignal);
-			pokemons = pokemons.filter(pokemon => this._favoriteIds.includes(pokemon.id));
-			this._favoritePokemons.push(...pokemons);
-		}
-		else {
-			pokemons = this._favoritePokemons.slice(offset, CHUNK_SIZE);
-		}
-
-		return pokemons;
+		return this._apiClient.pokemon(abortSignal, CHUNK_SIZE, offset, "", this._favoriteIds);
 	}
 
     async pokemons(offset: number, searchFilter: string, abortSignal: AbortSignal)

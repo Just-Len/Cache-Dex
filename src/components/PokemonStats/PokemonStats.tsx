@@ -7,6 +7,38 @@ import { STRINGS } from '../../strings';
 
 import './PokemonStats.css';
 
+interface ImageData
+{
+	alt: string;
+	src: string;
+}
+
+function Image({ alt, src }: ImageData)
+{
+	const [imageLoaded, setImageLoaded] = useState(false);
+	
+	function imageFinishedLoading() {
+		console.log("image loaded");
+		setImageLoaded(true);
+	}
+
+	return (
+		<div className="align-items-center d-flex justify-content-center" style={{ height: "96px" }}>
+			<div className="mx-auto text-center text-muted" hidden={imageLoaded}>
+				<img alt="Pikachu running GIF" className="d-block mx-auto" src="image/pikachu-running.gif" style={{ width: "50%" }}/>
+				{ STRINGS.loadingImage }
+			</div>
+			<img
+				alt={ alt }
+				className="mb-3"
+				hidden={ !imageLoaded }
+				onLoad={ imageFinishedLoading }
+				src={src}
+				style={{ height: "100%" }}/>
+		</div>
+	);
+}
+
 export function PokemonStats()
 {
 	const pokemonService = new PokemonService();
@@ -94,14 +126,14 @@ export function PokemonStats()
 						</div>
 					}
 					scrollableTarget="scrollable">
-						<div className="row justify-content-center">
+						<div id="main-content" className="row justify-content-center">
 							{pokemons.map(pokemon => (
 								<div
 									key={pokemon.id}
 									className="pokemon-card"
 									onClick={() => setSelectedPokemon(pokemon)}
 									tabIndex={0}>
-									<img src={pokemon.sprites.front_default ?? ""} alt={pokemon.name} />
+									<Image alt={ `${pokemon.name} image` } src={ pokemon.sprites.front_default ?? "" }/>
 									<h5 className="text-center">{ pokemon.species.names.get(languageId) }</h5>
 								</div>
 							))}

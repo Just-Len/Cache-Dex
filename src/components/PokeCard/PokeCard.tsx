@@ -102,7 +102,7 @@ export function Pokecard({ pokemon, favoriteAction }: PokecardProps)
 					<p className="mb-3"><strong>{STRINGS.id}:</strong> {pokemon?.id}</p>
 	  
 					<button
-					  className={`align-items-center btn btn-outline-${favoriteButtonKind} d-flex gap-2 mt-auto px-4 rounded-pill`}
+					  className={`align-items-center btn btn-outline-${favoriteButtonKind} d-flex gap-2 m-auto px-4 rounded-pill`}
 					  onClick={(event) => toggleFavorite(event)}
 					  tabIndex={0}>
 						<div>⭐</div>

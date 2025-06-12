@@ -33,7 +33,12 @@ export class PokemonService
 
 	async favoritePokemons(offset: number, abortSignal: AbortSignal)
 	{
-		return this._apiClient.pokemon(abortSignal, CHUNK_SIZE, offset, "", this._favoriteIds);
+		const pokemons = await this._apiClient.pokemon(abortSignal, CHUNK_SIZE, offset, "", this._favoriteIds);
+		for (const pokemon of pokemons) {
+			pokemon.favorite = true;
+		}
+
+		return pokemons;
 	}
 
     async pokemons(offset: number, searchFilter: string, abortSignal: AbortSignal)

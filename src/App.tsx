@@ -1,15 +1,16 @@
 import { TabList, TabPanel, Tabs } from "react-tabs"
 import { IconTab } from "./components/Home/icon-tab";
-import "react-tabs/style/react-tabs.css";
-import 'bootstrap/dist/css/bootstrap.min.css';
 import { Pokedex } from "./components/Pokedex/Pokedex";
 import { Favorites } from "./components/Favorites";
 import { PokemonStats } from "./components/PokemonStats/PokemonStats";
 import { STRINGS } from "./strings";
 import { useEffect, useState } from "react";
-import "./App.css"
 import { useRefresh } from "./util";
+
 import "@fortawesome/fontawesome-free/css/all.min.css";
+import "react-tabs/style/react-tabs.css";
+import "bootstrap/dist/css/bootstrap.min.css";
+import "./App.css"
 
 export default function App()
 {
@@ -17,8 +18,20 @@ export default function App()
 	const [darkMode, setDarkMode] = useState<boolean>(false);
 
 	useEffect(() => {
+		window.onlanguagechange = () => {
+			STRINGS.setLanguage(navigator.language);
+			refresh();
+		};
+
+		window.matchMedia("(prefers-color-scheme: dark)").addEventListener("change", mediaChanged);
+
 		const savedTheme = localStorage.getItem("theme");
 		setDarkMode(savedTheme === "dark");
+
+		return () => {
+			window.onlanguagechange = null;
+			window.matchMedia("(prefers-color-scheme: dark)").removeEventListener("change", mediaChanged);
+		};
 	}, []);
 
 	useEffect(() => {
@@ -33,14 +46,9 @@ export default function App()
 		localStorage.setItem("theme", darkMode ? "dark" : "light");
 	}, [darkMode]);
 
-	useEffect(() => {
-		window.onlanguagechange = () => {
-			STRINGS.setLanguage(navigator.language);
-			refresh();
-		};
-
-		return () => { window.onlanguagechange = null };
-	}, []);
+	function mediaChanged(event: MediaQueryListEvent) {
+		setDarkMode(event.matches);
+	}
 
 	return (
 		<Tabs className="tabs-container container-fluid bg-dark text-light">

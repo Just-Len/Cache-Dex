@@ -12,10 +12,17 @@ import "react-tabs/style/react-tabs.css";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "./App.css"
 
-export default function App()
-{
+export default function App() {
 	const refresh = useRefresh();
 	const [darkMode, setDarkMode] = useState<boolean>(false);
+	const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
+
+	useEffect(() => {
+		const handleResize = () => setIsMobile(window.innerWidth <= 768);
+		window.addEventListener("resize", handleResize);
+
+		return () => window.removeEventListener("resize", handleResize);
+	}, []);
 
 	useEffect(() => {
 		window.onlanguagechange = () => {
@@ -52,7 +59,7 @@ export default function App()
 
 	return (
 		<Tabs className="tabs-container container-fluid bg-dark text-light">
-			<TabList style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+			{!isMobile ? <TabList style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
 				<div style={{ display: "flex", gap: "1rem" }}>
 					<IconTab iconUrl="image/pokedex.png" title={STRINGS.pokedex} />
 					<IconTab iconUrl="image/pokemon-shiny.png" title={STRINGS.favorites} />
@@ -72,7 +79,7 @@ export default function App()
 						<span className="ball"></span>
 					</label>
 				</div>
-			</TabList>
+			</TabList> : <></>}
 
 			<TabPanel>
 				<Pokedex />
@@ -83,6 +90,32 @@ export default function App()
 			<TabPanel>
 				<PokemonStats />
 			</TabPanel>
+
+			{isMobile ? (
+				<>
+					<div className="switch-container-mobile">
+						<input
+							type="checkbox"
+							id="switch"
+							checked={darkMode}
+							onChange={() => setDarkMode((prev) => !prev)}
+						/>
+						<label htmlFor="switch">
+							<i className="fas fa-sun"></i>
+							<i className="fas fa-moon"></i>
+							<span className="ball"></span>
+						</label>
+					</div>
+
+					<TabList style={{ display: "flex", alignItems: "center", justifyContent: "center" }}>
+						<div style={{ display: "flex", gap: "1rem" }}>
+							<IconTab iconUrl="image/pokedex.png" title={STRINGS.pokedex} />
+							<IconTab iconUrl="image/pokemon-shiny.png" title={STRINGS.favorites} />
+							<IconTab iconUrl="image/floppy-disk.png" title={STRINGS.cachedex} />
+						</div>
+					</TabList>
+				</>
+			) : <></>}
 		</Tabs>
 	);
 }

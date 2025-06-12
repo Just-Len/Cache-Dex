@@ -196,3 +196,17 @@ label .ball {
 input:checked + label .ball {
   transform: translateX(40px);
 }
+
+
+  .switch-container-mobile {
+    display: inline-block;
+    position: relative;
+    position: fixed;
+    top: 1rem;
+    right: 1rem;
+    z-index: 1001;
+  }
+
+  .switch-container-mobile input {
+    display: none;
+  }

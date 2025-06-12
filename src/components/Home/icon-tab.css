@@ -2,6 +2,7 @@ body.dark .icon-tab-selected {
 	background-color: #1e1e1e;
 	color: #fff;
 }
+
 .icon-tab {
 	border: 1px solid transparent;
 	border-bottom: none;
@@ -15,8 +16,8 @@ body.dark .icon-tab-selected {
 	display: inline-flex;
 	flex-flow: column;
 	gap: 0.5em;
-	outline: none;
 }
+
 .icon-tab-selected {
 	background: #fff;
     border-color: #aaa;
@@ -24,6 +25,7 @@ body.dark .icon-tab-selected {
 
 	border-radius: 10px 10px 0 0;
 }
+
 .icon-tab-image {
 	height: 2em;
 	width: 2em;

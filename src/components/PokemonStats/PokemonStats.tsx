@@ -2,10 +2,42 @@ import React, { useEffect, useRef, useState } from 'react';
 import InfiniteScroll from 'react-infinite-scroll-component';
 import { PokemonService } from '../../services/pokemon-service';
 import { languageIdFor, Pokemon } from '../../typedef';
+import useScrollable from '../../useScrollable';
+import { STRINGS } from '../../strings';
 
 import './PokemonStats.css';
-import { STRINGS } from '../../strings';
-import useScrollable from '../../useScrollable';
+
+interface ImageData
+{
+	alt: string;
+	src: string;
+}
+
+function Image({ alt, src }: ImageData)
+{
+	const [imageLoaded, setImageLoaded] = useState(false);
+	
+	function imageFinishedLoading() {
+		console.log("image loaded");
+		setImageLoaded(true);
+	}
+
+	return (
+		<div className="align-items-center d-flex justify-content-center" style={{ height: "96px" }}>
+			<div className="mx-auto text-center text-muted" hidden={imageLoaded}>
+				<img alt="Pikachu running GIF" className="d-block mx-auto" src="image/pikachu-running.gif" style={{ width: "50%" }}/>
+				{ STRINGS.loadingImage }
+			</div>
+			<img
+				alt={ alt }
+				className="mb-3"
+				hidden={ !imageLoaded }
+				onLoad={ imageFinishedLoading }
+				src={src}
+				style={{ height: "100%" }}/>
+		</div>
+	);
+}
 
 export function PokemonStats()
 {
@@ -75,32 +107,33 @@ export function PokemonStats()
 		if (!loading && pokemons.length == 0) {
 			return (
 				<div className="align-items-center d-flex flex-column h-100 justify-content-center w-100">
-					<img style={{ height: "7em" }} src="image/pikachu-winking.gif" />
+					<img aria-label="Pikachu winking GIF" style={{ height: "7em" }} src="image/pikachu-winking.gif" />
 					<p className="text-center">{ STRINGS.noPokemons }</p>
 				</div>
 			);
 		}
 		
 		return (
-			<div id="scrollable" ref={ scrollableRef } style={{ flex: 1, overflowY: "auto" }}>
+			<div id="scrollable" ref={ scrollableRef } style={{ flex: 1, overflowY: "auto" }} tabIndex={-1}>
 				<InfiniteScroll
 					dataLength={pokemons.length}
 					next={nextPage}
 					hasMore={hasMore}
 					loader={
 						<div style={{ textAlign: "center" }}>
-							<img style={{ height: "5em" }} src="image/pikachu-running.gif" alt="Cargando" />
+							<img aria-label="Pikachu running GIF" style={{ height: "5em" }} src="image/pikachu-running.gif" alt="Cargando" />
 							<h4 className="text-center">{STRINGS.loading}</h4>
 						</div>
 					}
 					scrollableTarget="scrollable">
-						<div className="row justify-content-center">
+						<div id="main-content" className="row justify-content-center">
 							{pokemons.map(pokemon => (
 								<div
 									key={pokemon.id}
 									className="pokemon-card"
-									onClick={() => setSelectedPokemon(pokemon)}>
-									<img src={pokemon.sprites.front_default ?? ""} alt={pokemon.name} />
+									onClick={() => setSelectedPokemon(pokemon)}
+									tabIndex={0}>
+									<Image alt={ `${pokemon.name} image` } src={ pokemon.sprites.front_default ?? "" }/>
 									<h5 className="text-center">{ pokemon.species.names.get(languageId) }</h5>
 								</div>
 							))}

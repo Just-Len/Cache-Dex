@@ -59,6 +59,7 @@ export default function App() {
 
 	return (
 		<Tabs className="tabs-container container-fluid bg-dark text-light">
+			<a id="skip-to-main-content-link" href="#main-content" className="screen-reader-text">Skip to main content</a>
 			{!isMobile ? <TabList style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
 				<div style={{ display: "flex", gap: "1rem" }}>
 					<IconTab iconUrl="image/pokedex.png" title={STRINGS.pokedex} />
@@ -71,9 +72,8 @@ export default function App() {
 						type="checkbox"
 						id="switch"
 						checked={darkMode}
-						onChange={() => setDarkMode((prev) => !prev)}
-					/>
-					<label htmlFor="switch">
+						onChange={() => setDarkMode((prev) => !prev)}/>
+					<label htmlFor="switch" role="switch">
 						<i className="fas fa-sun"></i>
 						<i className="fas fa-moon"></i>
 						<span className="ball"></span>
